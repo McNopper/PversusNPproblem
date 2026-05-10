@@ -6,7 +6,7 @@ Given $n$ cities $C = \{c_1, \dots, c_n\} \subset \mathbb{R}^2$, a *tour*
 is a cyclic permutation $\pi$ of $C$, and its length is
 $L(\pi) = \sum_i \|c_{\pi(i)} - c_{\pi(i+1)}\|_2$ (indices mod $n$).
 Euclidean TSP asks for an $L$-minimum tour. The decision form is
-NP-Complete [5]; the optimization form is NP-Hard. The exact Held–Karp
+NP-Complete [5]; the optimisation form is NP-Hard. The exact Held–Karp
 DP [6] runs in $O(n^2 \cdot 2^n)$ time and is feasible only for small
 $n$. SiftTSP is a polynomial-time *heuristic* — it is not exact, see
 §2.3.
