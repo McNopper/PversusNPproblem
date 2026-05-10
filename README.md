@@ -159,16 +159,8 @@ A compact write-up in Springer LNCS style lives in [`paper/`](paper):
 |---|---|
 | [Abstract](paper/00-abstract.md) | Title, abstract, keywords |
 | [1 · Algorithm & Complexity](paper/01-algorithm.md) | Setting, parameters, four phases, pseudocode, $O(n \log n)$ / $O(n^2)$ proof |
-| [2 · Experiments](paper/02-experiments.md) | Battery, counterexample, iteration history, discussion |
+| [2 · Experiments](paper/02-experiments.md) | Battery, counterexample, discussion |
 | [References](paper/03-references.md) | Bibliography |
-
-## Design history
-
-SiftTSP is the consolidation of 17 incremental design iterations. The
-individual iteration files (`tsp_p.py`, `tsp_p2.py`, ..., `tsp_p17.py`)
-are no longer carried in the repository; their full source is preserved
-in the git history. A short narrative summary of the design milestones
-is in paper §2.5.
 
 ## License
 

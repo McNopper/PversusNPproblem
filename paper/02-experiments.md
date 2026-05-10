@@ -97,9 +97,9 @@ $\pi^*$. The `rings-12` Held–Karp optimum is empirically
 non-contiguous with respect to every $D$ tried at $d \leq 3$ (any
 straight-line bisection separates the two rings or cuts them in two
 diametrically opposed half-rings, while the optimum alternates between
-inner and outer rings). The mill+sieve refinement of iteration 17
-(§2.5) adds finer angular resolution but does not change the
-decomposition primitive, so it cannot defeat the obstruction.
+inner and outer rings). Finer angular search adds resolution but does
+not change the decomposition primitive, so it cannot defeat the
+obstruction.
 
 ### 2.4  Observations
 
@@ -121,46 +121,7 @@ findings, not statistical claims.
    $+5.46\%$ while $d \in \{1, 3\}$ are exact. Finer subdivision can
    split clusters that the optimum traverses contiguously.
 
-### 2.5  Iteration History
-
-The current `SiftTSP.py` is the consolidation of 17 design iterations.
-The intermediate files (`tsp_p.py`, `tsp_p2.py`, ..., `tsp_p17.py`) are
-no longer carried in the repository; their full source is preserved in
-the git history.
-
-**Table 3.** Iteration milestones — gap on a fixed 10-city instance
-$C_{10}$, $L^* = 32.9296$.
-
-| Iteration | Key Design Change | Gap on $C_{10}$ |
-|---|---|:---:|
-| 1   | Global min-max heuristic only | ~23% |
-| 2   | Divide & conquer + edge-swap merge | 5.4% |
-| 3   | Iterative vertical/horizontal + min-max | ~19–25% |
-| 4   | Four-direction axis rotation | 0% (n=8), variable |
-| 5   | Four sections, 48-combination brute-force join | 0% (n ≤ 11) |
-| 6   | Depth $d$ as parameter; greedy chain join | Degraded at $d \geq 3$ |
-| 7   | $d=3$; brute-force join (645 K combinations) | 0% (limited tests) |
-| 8   | Brute-force threshold $\tau$ as parameter | 0% on $C_{10}$ at $d{\geq}2$ |
-| 9   | Worst-case greedy-longest start added | 0% on $C_{10}$ at $d{\geq}2$ |
-| 10  | Progressive sift + bidirectional mill rotation | 0% on $C_{10}$ at $d{\geq}2$ |
-| 11  | Sandclock depth schedule $1\to d_{\max}\to 1$ | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-| 12  | Convergence-driven Phase 4 loop over $(d_{\max}, m)$ | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-| 13  | Section solver evaluates min-max and max-min | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-| 14  | Phase 4 alternates section mode (2-state cycle) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-| 15  | Phase 4 cycles mode × mill-direction (4-state) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-| 16  | Phase 4 8-state super-cycle (mode × dir × ordering) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-| **17 (`SiftTSP.py`)** | **SiftTSP**: adds sieve (depth) sweep alongside mill (breadth) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-
-**Caveat on Table 3.** The gap percentages for iterations 1–7 are
-estimates carried forward from development notes and have not been
-re-measured against the consolidated reference implementation.
-Iteration 17 (`SiftTSP.py`) is the only entry whose result is
-reproducible from the current repository. The earlier 0%-gap entries on
-$C_{10}$ were once treated as evidence of exactness; the broader
-battery in Table 1, and the `rings-12` counterexample, show that this
-was an artefact of a small unrepresentative test set.
-
-### 2.6  Discussion
+### 2.5  Discussion
 
 **Where SiftTSP appears useful (on this battery).** Determinism
 (reproducible given $(C, d, \tau, m, s)$); strong performance on inputs
@@ -173,7 +134,7 @@ generalises.
 ceiling of *any* algorithm that explores only a fixed-in-advance
 family of geometric decompositions and then optimally chains the
 resulting component paths. The `rings-12` $+3.24\%$ wall is unmoved by
-the mill+sieve refinement of iteration 17, consistent with the
+the mill+sieve refinement, consistent with the
 obstruction being structural rather than angular-resolution-limited.
 The connection step's $(2^d - 1)! \cdot 2^{2^d - 1}$ growth blocks
 $d \geq 4$ unless replaced by a smarter chaining primitive.

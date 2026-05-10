@@ -14,10 +14,6 @@ Architecture (full prose: paper/):
     Phase 3  min         exact brute force on sections of size <= tau
     Phase 4  loop        8-state (mode, direction, ordering) super-cycle;
                          mill and sieve ceilings grow independently
-
-The 17 incremental design iterations that produced this file
-(`tsp_p.py`, `tsp_p2.py`, ..., `tsp_p17.py`) have been removed; their
-source is preserved in the git history.
 """
 
 import math
@@ -376,7 +372,7 @@ def tsp_adaptive(cities, depth=3, bf_threshold=6):
     return sift_tsp(cities, d_ceiling=depth, bf_threshold=bf_threshold)
 
 
-# Backwards-compatible alias for the iteration-17 name.
+# Backwards-compatible alias.
 tsp_progressive = sift_tsp
 
 
