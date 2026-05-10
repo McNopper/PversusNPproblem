@@ -3,7 +3,7 @@
 ### 2.1  Setup
 
 All experiments use the Euclidean distance metric. Optimal tours are
-computed by the exact Held–Karp DP [7] (feasible up to $n \approx 20$).
+computed by the exact Held–Karp DP [6] (feasible up to $n \approx 20$).
 We compare SiftTSP (`SiftTSP.py`, entry point `sift_tsp`) against:
 
 - **Held–Karp**: exact $O(n^2 \cdot 2^n)$ DP — ground-truth optimum.
@@ -157,7 +157,7 @@ by a smarter chaining primitive.
 - *Adaptive decomposition* (axes that depend on local geometry).
 - *Recursive connection* (replace the brute-force chain by a
   recursive SiftTSP application on the path endpoints).
-- *Hybridisation* with 2-opt or Lin–Kernighan-Helsgaun [9] using
+- *Hybridisation* with 2-opt or Lin–Kernighan-Helsgaun [8] using
   SiftTSP as an initial-tour generator.
 - *Characterisation of exactness regimes* — a sufficient geometric
   condition on $C$ guaranteeing exactness would clarify the value of

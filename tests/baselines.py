@@ -1,5 +1,5 @@
 """
-Baseline TSP algorithms for honest comparison against `tsp.py`.
+Baseline TSP algorithms for honest comparison against `SiftTSP.py`.
 
 Includes:
   - held_karp: exact O(n^2 * 2^n) DP, feasible to n ~= 20

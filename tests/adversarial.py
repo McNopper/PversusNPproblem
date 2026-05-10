@@ -160,7 +160,7 @@ def main():
     print("SUMMARY")
     print("=" * 60)
     print(f"Total adversarial cases  : {len(cases)}")
-    print(f"Cases where tsp missed: {total_failures}")
+    print(f"Cases where SiftTSP missed optimum : {total_failures}")
     if failure_log:
         print("\nCounterexamples found:")
         for name, n, opt, fails in failure_log:
