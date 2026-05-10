@@ -20,11 +20,6 @@ Salesman Problem (TSP), built around recursive geometric bisection with a
   coordinates and a self-contained verification harness.
 - **[`tests/`](tests)** — Held–Karp / nearest-neighbor / 2-opt baselines and
   the adversarial test battery used in paper §2.
-- **[`examples/`](examples)** — 110 reference Python implementations of
-  problems across the complexity hierarchy ($\mathcal{P}$, $\mathcal{NP}$,
-  NP-Complete, NP-Hard). These are **not** part of the TSP algorithm; they
-  were collected as a contextual reference for the broader complexity
-  landscape this work is embedded in.
 
 ## How to run
 
