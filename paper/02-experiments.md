@@ -105,7 +105,7 @@ cannot break Proposition 2.
 
 ### 2.5  Iteration History
 
-The current `tsp.py` is the consolidation of 17 design iterations.
+The current `SiftTSP.py` is the consolidation of 17 design iterations.
 The intermediate files (`tsp_p.py`, `tsp_p2.py`, ..., `tsp_p17.py`) are
 no longer carried in the repository; their full source is preserved in
 the git history.
@@ -131,7 +131,7 @@ $C_{10}$, $L^* = 32.9296$.
 | 14  | Phase 4 alternates section mode (2-state cycle) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
 | 15  | Phase 4 cycles mode × mill-direction (4-state) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
 | 16  | Phase 4 8-state super-cycle (mode × dir × ordering) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
-| **17 (`tsp.py`)** | **SiftTSP**: adds sieve (depth) sweep alongside mill (breadth) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
+| **17 (`SiftTSP.py`)** | **SiftTSP**: adds sieve (depth) sweep alongside mill (breadth) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
 
 **Caveat.** The 0%-gap entries on $C_{10}$ in earlier drafts were
 treated as evidence of exactness; the broader battery in Table 1, and

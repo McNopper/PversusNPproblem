@@ -1,7 +1,6 @@
-# SiftTSP: A Geometric Sandclock-Sift Heuristic for Euclidean TSP
+## Abstract
 
-**[Author Name]** — *[Institution], [City, Country]*
-`[email@institution.edu]`
+**SiftTSP: A Geometric Sandclock-Sift Heuristic for Euclidean TSP**
 
 ---
 
