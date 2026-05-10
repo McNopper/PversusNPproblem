@@ -4,12 +4,6 @@ A deterministic, polynomial-time **heuristic** for the Euclidean Travelling
 Salesman Problem (TSP), built around recursive geometric bisection with a
 *sandclock* depth schedule and a *mill + sieve* angular search.
 
-> **Status.** SiftTSP runs in $O(n^2)$ time for fixed parameters
-> (proven, paper §1.6). It is **not exact**: an explicit 12-point
-> Euclidean counterexample is shipped in
-> [`counterexample.py`](counterexample.py). This work makes **no claim**
-> of resolving $\mathcal{P}$ versus $\mathcal{NP}$ in either direction.
-
 ## What is in this repository
 
 - **[`SiftTSP.py`](SiftTSP.py)** — the algorithm (entry point: `sift_tsp`).
@@ -62,7 +56,7 @@ $$
 
 **Phase 1 — Max (worst-case start, once).**
 Construct a deliberately bad initial tour by greedy *farthest*-next
-insertion. The resulting length is a guaranteed upper-bound floor that the
+insertion. The resulting length is a guaranteed upper bound that the
 rest of the algorithm only ever lowers.
 
 **Phase 2 — Sift (one sandclock sweep, mill + sieve).**
@@ -158,7 +152,7 @@ A compact write-up in Springer LNCS style lives in [`paper/`](paper):
 | Section | Content |
 |---|---|
 | [Abstract](paper/00-abstract.md) | Title, abstract, keywords |
-| [1 · Algorithm & Complexity](paper/01-algorithm.md) | Setting, parameters, four phases, pseudocode, $O(n \log n)$ / $O(n^2)$ proof |
+| [1 · Algorithm & Complexity](paper/01-algorithm.md) | Setting, parameters, four phases, pseudocode, $O(n^2)$ proof |
 | [2 · Experiments](paper/02-experiments.md) | Battery, counterexample, discussion |
 | [References](paper/03-references.md) | Bibliography |
 
