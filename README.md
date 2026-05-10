@@ -63,7 +63,7 @@ rest of the algorithm only ever lowers.
 At depths $d = 1, 2, \ldots, d_{\max}, \ldots, 2, 1$ (the *sandclock*
 schedule) the angular axis is searched with two complementary sweeps:
 
-- **Mill (breadth).** Uniform third-segment sweep at angles
+- **Mill (breadth).** Uniform third-step sweep at angles
   $0, \pm\alpha_d/3, \pm 2\alpha_d/3, \ldots$ where
   $\alpha_d = \pi / 2^d$, capped at $m$ third-steps per direction.
 - **Sieve (depth).** Damped forth-and-back oscillation around the best
