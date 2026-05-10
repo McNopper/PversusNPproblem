@@ -96,7 +96,7 @@ Phase 2 sweeps are repeated at increasing parameters. Each sweep is
 configured by a triple $(\text{mode}, \text{direction}, \text{ordering})$
 giving an 8-state super-cycle:
 
-| $k$ | mode | direction-first | cycle ordering |
+| $k$ | mode | direction | ordering |
 |---|---|---|---|
 | 0 | max-min | CW | MD |
 | 1 | min-max | CW | MD |
