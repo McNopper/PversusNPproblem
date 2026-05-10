@@ -67,38 +67,56 @@ $L^* = 29.7823$.
 | SiftTSP, $d=2$, $\tau=6$ | 31.7503 | $+6.61\%$ |
 | SiftTSP, $d=3$, $\tau=6$ | 30.7478 | $+3.24\%$ |
 
-**Proposition 1.** *SiftTSP with $\tau = 6$ and any
+**Proposition 1 (Non-exactness).** *SiftTSP with $\tau = 6$ and any
 $d \in \{1, 2, 3\}$ is not exact on the Euclidean TSP.*
+*Proof.* The 12-point instance `RINGS_12` in `counterexample.py` is a
+witness: Held–Karp's optimum has length $29.7823$, while SiftTSP at
+$d=1,2$ returns $31.7503$ and at $d=3$ returns $30.7478$, all strictly
+greater. Values are reproducible by `python counterexample.py`. $\square$
 
-The structural reason is captured by:
+The following is the structural intuition for *why* rings-12 defeats
+the algorithm; it is an argument, not a formal proof of non-exactness
+(Proposition 1 above does that).
 
-**Proposition 2 (Decomposition irrecoverability).**
-*Any algorithm that (i) commits to a fixed geometric decomposition $D$
-of the city set before seeing the optimal tour, (ii) solves each
-component of $D$ optimally as an open path, and (iii) optimally chains
-those paths into a closed tour, can return a tour strictly longer than
-the global optimum.*
+**Argument (Decomposition irrecoverability).**
+*Fix a finite family $\mathcal{D}$ of geometric decompositions of a
+point set $C$, each partitioning $C$ into components, and consider any
+algorithm that, for each $D \in \mathcal{D}$, solves every component
+optimally as an open path and then optimally chains those paths into a
+closed tour, finally returning the shortest tour across all
+$D \in \mathcal{D}$. If the global optimum $\pi^*$ is not
+"component-contiguous" for any $D \in \mathcal{D}$ — i.e.\ for every
+$D$, some component of $D$ is entered and left more than once by
+$\pi^*$ — then no chaining can recover $\pi^*$, and the algorithm's
+output is strictly longer than $L(\pi^*)$.*
 
-*Justification.* The closed tour returned by such an algorithm is the
-shortest among those that visit each component contiguously. The global
-optimum is not constrained to do so; if the optimum interleaves cities
-across components, no chaining can recover it. The `rings-12`
-Held–Karp optimum interleaves inner-ring and outer-ring vertices in a
-way no bisection along any of the four axes respects. $\square$
-
-The mill+sieve refinement of iteration 17 (§2.5) adds finer angular
-resolution but does not change the decomposition primitive, so it
-cannot break Proposition 2.
+This applies to SiftTSP because the family $\mathcal{D}$ it explores
+(median bisections at depths $1, \dots, d_{\max}$ along finitely many
+rotated axes and four axis-pairs) is *fixed* and does not depend on
+$\pi^*$. The `rings-12` Held–Karp optimum is empirically
+non-contiguous with respect to every $D$ tried at $d \leq 3$ (any
+straight-line bisection separates the two rings or cuts them in two
+diametrically opposed half-rings, while the optimum alternates between
+inner and outer rings). The mill+sieve refinement of iteration 17
+(§2.5) adds finer angular resolution but does not change the
+decomposition primitive, so it cannot defeat the obstruction.
 
 ### 2.4  Observations
 
+The following are observations from the 14-instance battery (Table 1).
+Each instance is run on a single fixed seed; we report descriptive
+findings, not statistical claims.
+
 1. **Structured inputs are matched.** On zigzag, comb, and interleaved
-   instances, SiftTSP at $d \geq 2$ matches Held–Karp in every case,
-   including instances where NN has gaps up to $+38\%$.
-2. **Rotationally symmetric inputs are not matched, but 2-opt is
-   beaten.** On `rings-12` and `rings-14`, NN and 2-opt are stuck at
-   $+17.63\%$ and $+8.58\%$; SiftTSP at $d=3$ achieves $+3.24\%$ and
-   $+1.52\%$.
+   instances ($n \in \{12, 14, 16\}$), SiftTSP at $d \geq 2$ matches
+   Held–Karp in every tested case, including instances where NN has
+   gaps up to $+38\%$.
+2. **Two rotationally symmetric inputs are not matched, but 2-opt is
+   beaten on both.** On `rings-12` and `rings-14`, NN and 2-opt are
+   stuck at $+17.63\%$ and $+8.58\%$; SiftTSP at $d=3$ achieves
+   $+3.24\%$ and $+1.52\%$. Sample size is two; we do not claim this
+   pattern holds on a wider population of rotationally symmetric
+   instances.
 3. **Increasing depth is not monotone.** On `uniform-12`, $d{=}2$ gives
    $+5.46\%$ while $d \in \{1, 3\}$ are exact. Finer subdivision can
    split clusters that the optimum traverses contiguously.
@@ -133,36 +151,43 @@ $C_{10}$, $L^* = 32.9296$.
 | 16  | Phase 4 8-state super-cycle (mode × dir × ordering) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
 | **17 (`SiftTSP.py`)** | **SiftTSP**: adds sieve (depth) sweep alongside mill (breadth) | 0% on $C_{10}$ at $d_{\max}{\geq}2$ |
 
-**Caveat.** The 0%-gap entries on $C_{10}$ in earlier drafts were
-treated as evidence of exactness; the broader battery in Table 1, and
-the `rings-12` counterexample, show that this was an artefact of a
-small unrepresentative test set.
+**Caveat on Table 3.** The gap percentages for iterations 1–7 are
+estimates carried forward from development notes and have not been
+re-measured against the consolidated reference implementation.
+Iteration 17 (`SiftTSP.py`) is the only entry whose result is
+reproducible from the current repository. The earlier 0%-gap entries on
+$C_{10}$ were once treated as evidence of exactness; the broader
+battery in Table 1, and the `rings-12` counterexample, show that this
+was an artefact of a small unrepresentative test set.
 
 ### 2.6  Discussion
 
-**Where SiftTSP is useful.** Determinism (reproducible given
-$(C, d, \tau, m, s)$); strong performance on inputs with a clear
-geometric scan order (zigzag/comb/interleaved); and a useful regime on
-rotationally symmetric inputs where 2-opt is trapped.
+**Where SiftTSP appears useful (on this battery).** Determinism
+(reproducible given $(C, d, \tau, m, s)$); strong performance on inputs
+with a clear geometric scan order (zigzag/comb/interleaved); and a
+suggestive regime on the two rotationally symmetric instances tested,
+where 2-opt is trapped. A larger study would be needed to claim this
+generalises.
 
-**Limits.** Decomposition irrecoverability (Proposition 2) is the hard
-structural ceiling of *any* algorithm of this shape. The
-`rings-12` $+3.24\%$ wall is unmoved by the mill+sieve refinement of
-iteration 17, confirming that the obstruction is structural, not
-angular-resolution-limited. The connection step's
-$(2^d - 1)! \cdot 2^{2^d - 1}$ growth blocks $d \geq 4$ unless replaced
-by a smarter chaining primitive.
+**Limits.** Decomposition irrecoverability (§2.3) is the structural
+ceiling of *any* algorithm that explores only a fixed-in-advance
+family of geometric decompositions and then optimally chains the
+resulting component paths. The `rings-12` $+3.24\%$ wall is unmoved by
+the mill+sieve refinement of iteration 17, consistent with the
+obstruction being structural rather than angular-resolution-limited.
+The connection step's $(2^d - 1)! \cdot 2^{2^d - 1}$ growth blocks
+$d \geq 4$ unless replaced by a smarter chaining primitive.
 
 **Open directions.**
 - *Adaptive decomposition* (axes that depend on local geometry).
 - *Recursive connection* (replace the brute-force chain by a
   recursive SiftTSP application on the path endpoints).
-- *Hybridisation* with 2-opt or Lin–Kernighan-Helsgaun [8] using
-  SiftTSP as an initial-tour generator.
+- *Hybridisation* with 2-opt or Lin–Kernighan [8] (or its LKH variant)
+  using SiftTSP as an initial-tour generator.
 - *Characterisation of exactness regimes* — a sufficient geometric
   condition on $C$ guaranteeing exactness would clarify the value of
   the algorithm as a conditional exact solver.
 
-None of these are claimed to break Proposition 2. SiftTSP is and will
-remain a heuristic; this work makes **no claim** of resolving
-$\mathcal{P}$ versus $\mathcal{NP}$.
+None of these are claimed to defeat the decomposition-irrecoverability
+obstruction. SiftTSP is and will remain a heuristic; this work makes
+**no claim** of resolving $\mathcal{P}$ versus $\mathcal{NP}$.

@@ -7,8 +7,8 @@ is a cyclic permutation $\pi$ of $C$, and its length is
 $L(\pi) = \sum_i \|c_{\pi(i)} - c_{\pi(i+1)}\|_2$ (indices mod $n$).
 Euclidean TSP asks for an $L$-minimum tour. The decision form is
 NP-Complete [5]; the optimization form is NP-Hard. The exact Held–Karp
-DP [6] runs in $O(n^2 \cdot 2^n)$ timeand is feasible only for small
-$n$. SiftTSP is a polynomial-time *heuristic* — it is not exact, see
+DP [6] runs in $O(n^2 \cdot 2^n)$ time and is feasible only for small
+$n$.SiftTSP is a polynomial-time *heuristic* — it is not exact, see
 §2.3.
 
 ### 1.2  Parameters and Phases
@@ -25,12 +25,16 @@ SiftTSP is controlled by four constants treated as fixed:
 The algorithm is structured in four phases:
 
 - **Phase 1 (max).** A worst-case greedy-longest tour, computed once,
-  fixes a length floor $B_0$ that the rest only lowers.
+  fixes an initial upper bound $B_0 \geq L^*$ that the rest only lowers.
 - **Phase 2 (sift).** At each depth $d$ on the sandclock schedule
   $1, 2, \dots, d_{\max}, \dots, 2, 1$ and at each angle $\theta$ in the
   current mill+sieve schedule, the city set is partitioned by recursive
-  bisection along four rotated axes (vertical, $/$, horizontal,
-  $\backslash$) into $2^d$ sections. Sections of size $> \tau$ are
+  median bisection along one of four axis-pairs (each pair: two
+  perpendicular axes from the rotated frame at angle $\theta$ — the
+  primary axis governs the top-level split, the secondary axis the next
+  level, alternating thereafter). The four pairs are taken from
+  $\{$vertical, $/$, horizontal, $\backslash\}$. The partition yields
+  $2^d$ sections.Sections of size $> \tau$ are
   solved by a greedy section solver in one of two complementary modes
   (selected per sweep by Phase 4):
   - **min-max**: at each step, append the city minimising the running
@@ -54,7 +58,7 @@ through both wide and narrow neighbourhoods of every depth.
 
 ### 1.3  The Phase 4 Super-Cycle
 
-Each sandclock sweep is parameterised by a quadruple
+Each sandclock sweep is parameterised by a tuple
 $(d_{\max}, m, s, \mu, \delta)$, where $\mu$ is the section-solver mode
 (min-max / max-min) and $\delta$ is the angular-sweep direction
 (CW / CCW). The four configurations $(\mu, \delta)$ may be visited in
@@ -150,46 +154,65 @@ The reference implementation is `SiftTSP.py`; entry point `sift_tsp`.
 ### 1.5  Complexity
 
 Treat $d_{\text{ceiling}}, m_{\text{ceiling}}, s_{\text{ceiling}}, \tau$
-as fixed.
+as fixed constants independent of $n$.
 
 **Lemma 1 (Subdivide).** Algorithm `Subdivide` runs in $O(n \log n)$
-time and produces at most $2^d$ sections.
-*Proof.* The recursion has depth $d$; at each level the cities are
-sorted once along the current axis at cost $O(n \log n)$. With $d$
-fixed, total work is $O(n \log n)$. $\square$
+time and produces at most $2^d$ sections of size $\lceil n/2^d \rceil$
+or $\lfloor n/2^d \rfloor$.
+*Proof.* The recursion has depth $d$. At each level the cities in each
+sub-list are sorted once along the current axis and split at the median,
+so each level does $O(n \log n)$ comparison work in total. With $d$
+fixed, total work is $O(n \log n)$. Median splits keep section sizes
+balanced. $\square$
 
-**Lemma 2 (Section solving).** With $k = 2^d$, processing all sections
-takes $O(1)$ in the all-brute-force regime ($\lceil n/k \rceil \leq
-\tau$) and $O(n^2 / k)$ in the all-greedy regime; the mixed regime is
-bounded by the larger.
-*Proof.* Brute force on a section of $\leq \tau$ cities is $O(\tau!) =
-O(1)$, and there are at most $k = O(1)$ such sections. For the greedy
-branch, each section costs $O(s_i^2)$ with $\sum_i s_i = n$ and at most
-$k$ non-empty sections, so $\sum_i s_i^2 \leq k \cdot (n/k)^2 = n^2/k$
-by Cauchy–Schwarz. $\square$
+**Lemma 2 (Section solving).** With $k = 2^d$ and balanced bisection
+(Lemma 1), processing all sections takes $O(1)$ time when every section
+has $\leq \tau$ cities (i.e.\ when $\lceil n/k \rceil \leq \tau$), and
+$O(n^2 / k)$ time otherwise; the mixed regime is bounded by the larger.
+*Proof.* Brute force on a section of $\leq \tau$ cities is $O(\tau!)
+= O(1)$, and there are at most $k = O(1)$ such sections, giving $O(1)$
+total. For the greedy branch, each section has size $s_i \leq \lceil
+n/k \rceil$ by balanced bisection, and the $O(s_i^2)$ greedy solver
+gives total cost $\sum_i s_i^2 \leq k \cdot (n/k)^2 = n^2/k$. $\square$
 
-**Lemma 3 (Connection).** `BruteForceConnect` runs in
-$O(n \cdot (k-1)! \cdot 2^{k-1}) = O(n)$ for fixed $d$, since there are
-$(k-1)!$ orderings and $2^{k-1}$ flip vectors and each tour is scored
-in $O(n)$ time. $\square$
+**Lemma 3 (Connection).** For fixed $d$ (hence fixed $k = 2^d$),
+`BruteForceConnect` runs in $O(n)$ time, since there are $(k-1)!$
+orderings and $2^{k-1}$ flip vectors (both $O(1)$ for fixed $d$) and
+each candidate tour is scored in $O(n)$. $\square$
 
-**Theorem 2 (Time complexity of SiftTSP).** *For fixed parameters,
-SiftTSP runs in $O(n \log n)$ time when $n \leq \tau \cdot
-2^{d_{\text{ceiling}}}$ (all-exact regime) and in $O(n^2)$ time
-otherwise.*
+**Lemma 4 (Phase 1).** The greedy-longest construction in the reference
+implementation runs in $O(n^2)$ time.
+*Proof.* At each of $n$ steps it scans the remaining unvisited cities to
+find the farthest from the current endpoint and removes it from a list,
+both $O(n)$ operations. $\square$
 
-*Proof.* Phase 1 costs $O(n^2)$. Each `EvalAt` invocation costs
-$O(n \log n)$ for `Subdivide` (Lemma 1), $O(1)$ or $O(n^2/2^d)$ for
-section solving (Lemma 2), and $O(n)$ for `BruteForceConnect`
-(Lemma 3). The number of `EvalAt` invocations per `SandclockSweep` is
+**Theorem 1 (Time complexity of SiftTSP).** *For fixed parameters,
+SiftTSP runs in $O(n^2)$ time on every input.*
+
+*Proof.* Phase 1 costs $O(n^2)$ (Lemma 4). Each `EvalAt` invocation
+costs $O(n \log n)$ for `Subdivide` (Lemma 1), $O(n^2/k)$ for section
+solving (Lemma 2; $O(1)$ in the bounded-$n$ all-exact regime), and
+$O(n)$ for `BruteForceConnect` (Lemma 3); together $O(n^2)$. The number
+of `EvalAt` invocations per `SandclockSweep` is
 $O(d_{\max} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) \cdot 4 =
 O(1)$. The total number of sweeps in Phase 4 is bounded by
 $d_{\text{ceiling}} \cdot 8 \cdot
-(\log m_{\text{ceiling}} + \log s_{\text{ceiling}} + 1) = O(1)$
+(\log m_{\text{ceiling}} + \log s_{\text{ceiling}} + 1) = O(1)$,
 because both ceilings double on improvement and at most 8 consecutive
-non-improving sweeps occur. Multiplying gives the stated bounds.
+non-improving sweeps occur at any rung. Multiplying gives $O(n^2)$.
 $\square$
 
 **Corollary 1.** *SiftTSP is a polynomial-time algorithm for all fixed
-parameters.* The polynomiality is a property of a *heuristic*: §2.3
-shows it is not exact in general.
+parameters.* Polynomiality is a property of a *heuristic*: §2.3 shows it
+is not exact in general.
+
+**Remark (sharper bounds in sub-regimes).** Phase 1 dominates the
+worst-case bound. If Phase 1 were replaced by an $O(n \log n)$
+implementation (e.g.\ via a $k$-d tree for farthest-point queries), and
+if $n$ is small enough that every section is brute-forced
+($\lceil n / 2^{d_{\text{ceiling}}} \rceil \leq \tau$), the overall
+complexity would drop to $O(n \log n)$. With fixed parameters that
+regime is reached only for $n \leq \tau \cdot 2^{d_{\text{ceiling}}}$,
+i.e.\ $n$ bounded by a constant, in which case the entire algorithm is
+trivially $O(1)$. We therefore report the honest worst-case bound
+$O(n^2)$.

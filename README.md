@@ -4,11 +4,11 @@ A deterministic, polynomial-time **heuristic** for the Euclidean Travelling
 Salesman Problem (TSP), built around recursive geometric bisection with a
 *sandclock* depth schedule and a *mill + sieve* angular search.
 
-> **Status.** SiftTSP runs in $O(n \log n)$ time for fixed parameters (proven,
-> paper §1.5). It is **not exact**: an explicit 12-point Euclidean
-> counterexample is shipped in [`counterexample.py`](counterexample.py). This
-> work makes **no claim** of resolving $\mathcal{P}$ versus $\mathcal{NP}$ in
-> either direction.
+> **Status.** SiftTSP runs in $O(n^2)$ time for fixed parameters
+> (proven, paper §1.5). It is **not exact**: an explicit 12-point
+> Euclidean counterexample is shipped in
+> [`counterexample.py`](counterexample.py). This work makes **no claim**
+> of resolving $\mathcal{P}$ versus $\mathcal{NP}$ in either direction.
 
 ## What is in this repository
 
@@ -42,13 +42,13 @@ Entry point: `sift_tsp(cities, d_ceiling, n_rot_ceiling, n_sift_ceiling, bf_thre
 
 ### Inputs
 
-| Input | Meaning |
-|---|---|
-| `cities` | List of $n$ points $(x, y) \in \mathbb{R}^2$ |
-| `d_ceiling` | Maximum recursive subdivision depth (sections at depth $d$: $2^d$) |
-| `n_rot_ceiling` | Mill (breadth) cap: third-steps per direction in the uniform sweep |
-| `n_sift_ceiling` | Sieve (depth) cap: halvings of the damped fan around the mill's best angle |
-| `bf_threshold` $\tau$ | Section size at or below which we solve exactly by brute force |
+| Input | Paper symbol | Meaning |
+|---|---|---|
+| `cities` | $C$ | List of $n$ points $(x, y) \in \mathbb{R}^2$ |
+| `d_ceiling` | $d_{\text{ceiling}}$ | Maximum recursive subdivision depth (sections at depth $d$: $2^d$) |
+| `n_rot_ceiling` | $m_{\text{ceiling}}$ | Mill (breadth) cap: third-steps per direction in the uniform sweep |
+| `n_sift_ceiling` | $s_{\text{ceiling}}$ | Sieve (depth) cap: halvings of the damped fan around the mill's best angle |
+| `bf_threshold` | $\tau$ | Section size at or below which we solve exactly by brute force |
 
 ### Four phases
 
@@ -128,23 +128,28 @@ guaranteed.
 
 ### Complexity
 
-For fixed `d_ceiling`, `n_rot_ceiling`, `bf_threshold`:
+For fixed `d_ceiling`, `n_rot_ceiling`, `n_sift_ceiling`, `bf_threshold`:
 
-| Regime | Cost |
+| Component | Worst-case cost |
 |---|---|
-| All-exact, $n \leq \tau \cdot 2^{d_{\text{ceiling}}}$ | $O(n \log n)$ |
-| Mixed, $n > \tau \cdot 2^{d_{\text{ceiling}}}$ | $O(n^2)$ |
+| Phase 1 (worst-case greedy-longest start) | $O(n^2)$ |
+| Per `EvalAt` (subdivide + section solve + connect) | $O(n^2)$ |
+| Number of `EvalAt` calls | $O(1)$ |
+| **Total** | **$O(n^2)$** |
 
-Both polynomial. See [`paper/01-algorithm.md`](paper/01-algorithm.md) §1.5
-for the proof (Theorem 2).
+Polynomial in all regimes. The dominant cost is Phase 1's pairwise
+farthest-point scans; a $k$-d-tree implementation would reduce this to
+$O(n \log n)$. See [`paper/01-algorithm.md`](paper/01-algorithm.md) §1.5
+for the proof (Theorem 1).
 
 ### Limitation
 
 The algorithm is not exact. The 12-point instance in
 [`counterexample.py`](counterexample.py) is the canonical witness. See
-[`paper/02-experiments.md`](paper/02-experiments.md) §2.3 for the structural
-reason (Proposition 2: a fixed geometric bisection forces section-contiguity
-in the output, but the optimum need not respect it).
+[`paper/02-experiments.md`](paper/02-experiments.md) §2.3 for the
+structural reason (decomposition irrecoverability: a fixed family of
+geometric bisections cannot recover an optimum that interleaves cities
+across components of every member of the family).
 
 ## The paper
 

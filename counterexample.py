@@ -11,8 +11,8 @@ SiftTSP d=3, t=6                                : 30.7478  (+3.24%)
 
 This refutes the empirical claim that the algorithm is exact for all
 tested small instances, and supports the structural argument of
-Proposition 2 (paper §2.3) that fixed geometric bisection cannot, in
-general, recover an optimal Euclidean tour.
+§2.3 (decomposition irrecoverability) that no fixed family of
+geometric bisections can, in general, recover an optimal Euclidean tour.
 
 Run:
     python counterexample.py

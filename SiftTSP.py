@@ -371,7 +371,7 @@ def sift_tsp(cities, d_ceiling=3, n_rot_ceiling=8, n_sift_ceiling=4,
     return best
 
 
-def tsp_adaptive(cities, depth=3, bf_threshold=6, max_rounds=20):
+def tsp_adaptive(cities, depth=3, bf_threshold=6):
     """Backwards-compatible alias used by counterexample.py and tests."""
     return sift_tsp(cities, d_ceiling=depth, bf_threshold=bf_threshold)
 
