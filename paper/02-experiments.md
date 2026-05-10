@@ -182,7 +182,7 @@ $d \geq 4$ unless replaced by a smarter chaining primitive.
 - *Adaptive decomposition* (axes that depend on local geometry).
 - *Recursive connection* (replace the brute-force chain by a
   recursive SiftTSP application on the path endpoints).
-- *Hybridisation* with 2-opt or Lin–Kernighan [8] (or its LKH variant)
+- *Hybridisation* with 2-opt or Lin–Kernighan [9] (LKH [10])
   using SiftTSP as an initial-tour generator.
 - *Characterisation of exactness regimes* — a sufficient geometric
   condition on $C$ guaranteeing exactness would clarify the value of

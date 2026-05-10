@@ -151,7 +151,47 @@ procedure EvalAt(C, d, theta, tau, mode, best, best_len):
 
 The reference implementation is `SiftTSP.py`; entry point `sift_tsp`.
 
-### 1.5  Complexity
+### 1.5  Prior Art and Contribution
+
+SiftTSP belongs to the family of **geometric-partitioning heuristics**
+for Euclidean TSP, whose canonical antecedent is Karp's 1977
+probabilistic analysis of partitioning algorithms [7]. In that scheme
+the plane is divided into rectangles, each sub-instance is solved
+(optimally or heuristically), and the sub-tours are reconnected. Later
+geometric heuristics, surveyed by Bentley [12], explore strip,
+space-filling-curve, and recursive variants. Arora's PTAS [11] is the
+theoretical apex of geometric methods, achieving a $(1+\varepsilon)$
+approximation in polynomial time but with constants that make it
+impractical at small $n$. State-of-the-art *practical* solvers — LKH
+[10], built on Lin–Kernighan [9], and Concorde [4] — are not
+partitioning-based and dominate empirically on TSPLIB-scale instances.
+
+Against this backdrop, **SiftTSP makes no theoretical claim that
+extends prior art.** Its complexity bound ($O(n^2)$) is no better than
+several classical heuristics; it offers no approximation ratio (unlike
+Christofides [8] for metric TSP or Arora [11] for Euclidean TSP); and
+it is empirically not exact (§2.3). What it offers is an *engineering
+recipe* combining:
+
+1. a **sandclock depth schedule** $1 \to d_{\max} \to 1$ that visits
+   every depth twice per sweep, once on the way up and once on the way
+   down;
+2. a **two-scale angular search** pairing a uniform "mill" (breadth)
+   with a damped "sieve" (depth) around the mill's best angle;
+3. an **8-state Phase 4 super-cycle** that systematically permutes
+   section-solver mode (min-max / max-min), angular sweep direction
+   (CW / CCW), and visit ordering (MD / DM), with independent
+   doubling caps on mill and sieve that grow only on improvement.
+
+To the authors' knowledge this specific orchestration is new, but each
+individual primitive (recursive median bisection, exhaustive
+sub-tour chaining, greedy section solvers, rotational axis search) is
+standard. We therefore frame SiftTSP as a **deterministic,
+reproducible, and falsifiable** partitioning heuristic — and ship a
+concrete witness to its non-exactness (§2.3) rather than leave
+exactness as an open question.
+
+### 1.6  Complexity
 
 Treat $d_{\text{ceiling}}, m_{\text{ceiling}}, s_{\text{ceiling}}, \tau$
 as fixed constants independent of $n$.

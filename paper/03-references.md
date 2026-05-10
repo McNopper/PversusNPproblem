@@ -25,14 +25,26 @@ https://doi.org/10.1007/978-1-4684-2001-2_9
 problems. Journal of the Society for Industrial and Applied Mathematics
 10(1), 196–210 (1962). https://doi.org/10.1137/0110015
 
-[7] Christofides, N.: Worst-case analysis of a new heuristic for the
+[7] Karp, R.M.: Probabilistic analysis of partitioning algorithms for
+the traveling-salesman problem in the plane. Mathematics of Operations
+Research 2(3), 209–224 (1977). https://doi.org/10.1287/moor.2.3.209
+
+[8] Christofides, N.: Worst-case analysis of a new heuristic for the
 travelling salesman problem. Report 388, Graduate School of Industrial
 Administration, Carnegie Mellon University (1976).
 
-[8] Lin, S., Kernighan, B.W.: An effective heuristic algorithm for the
+[9] Lin, S., Kernighan, B.W.: An effective heuristic algorithm for the
 traveling-salesman problem. Operations Research 21(2), 498–516 (1973).
 https://doi.org/10.1287/opre.21.2.498
 
-[9] Arora, S.: Polynomial time approximation schemes for Euclidean
+[10] Helsgaun, K.: An effective implementation of the Lin–Kernighan
+traveling salesman heuristic. European Journal of Operational Research
+126(1), 106–130 (2000). https://doi.org/10.1016/S0377-2217(99)00284-2
+
+[11] Arora, S.: Polynomial time approximation schemes for Euclidean
 traveling salesman and other geometric problems. Journal of the ACM
 45(5), 753–782 (1998). https://doi.org/10.1145/290179.290180
+
+[12] Bentley, J.L.: Fast algorithms for geometric traveling salesman
+problems. ORSA Journal on Computing 4(4), 387–411 (1992).
+https://doi.org/10.1287/ijoc.4.4.387

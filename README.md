@@ -5,7 +5,7 @@ Salesman Problem (TSP), built around recursive geometric bisection with a
 *sandclock* depth schedule and a *mill + sieve* angular search.
 
 > **Status.** SiftTSP runs in $O(n^2)$ time for fixed parameters
-> (proven, paper §1.5). It is **not exact**: an explicit 12-point
+> (proven, paper §1.6). It is **not exact**: an explicit 12-point
 > Euclidean counterexample is shipped in
 > [`counterexample.py`](counterexample.py). This work makes **no claim**
 > of resolving $\mathcal{P}$ versus $\mathcal{NP}$ in either direction.
@@ -139,7 +139,7 @@ For fixed `d_ceiling`, `n_rot_ceiling`, `n_sift_ceiling`, `bf_threshold`:
 
 Polynomial in all regimes. The dominant cost is Phase 1's pairwise
 farthest-point scans; a $k$-d-tree implementation would reduce this to
-$O(n \log n)$. See [`paper/01-algorithm.md`](paper/01-algorithm.md) §1.5
+$O(n \log n)$. See [`paper/01-algorithm.md`](paper/01-algorithm.md) §1.6
 for the proof (Theorem 1).
 
 ### Limitation
