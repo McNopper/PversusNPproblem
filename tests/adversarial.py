@@ -27,7 +27,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tsp import tsp_adaptive  # noqa: E402
+from SiftTSP import tsp_adaptive  # noqa: E402
 from tests.baselines import (  # noqa: E402
     held_karp,
     nearest_neighbor,

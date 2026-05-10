@@ -24,7 +24,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from tsp import tsp_adaptive
+from SiftTSP import tsp_adaptive
 from tests.baselines import held_karp, tour_length
 
 
