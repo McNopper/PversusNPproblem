@@ -83,7 +83,7 @@ For each evaluated $(d, \theta)$ and for each of the four axis pairs
      - `max-min` picks at each step the city that maximises the smallest
        edge so far.
 3. **Reconnect** the $2^d$ section paths into a closed tour by exhaustive
-   $(2^d {-} 1)! \cdot 2^{2^d - 1}$ search over orderings and orientations.
+   $(2^d - 1)! \cdot 2^{2^d - 1}$ search over orderings and orientations.
 
 The shortest tour seen across the sweep is kept.
 
