@@ -29,12 +29,13 @@ The algorithm is structured in four phases:
 - **Phase 2 (sift).** At each depth $d$ on the sandclock schedule
   $1, 2, \dots, d_{\max}, \dots, 2, 1$ and at each angle $\theta$ in the
   current mill+sieve schedule, the city set is partitioned by recursive
-  median bisection along one of four axis-pairs (each pair: two
+  median bisection along **each** of four axis-pairs (each pair: two
   perpendicular axes from the rotated frame at angle $\theta$ — the
   primary axis governs the top-level split, the secondary axis the next
   level, alternating thereafter). The four pairs are taken from
-  $\{$vertical, $/$, horizontal, $\backslash\}$. The partition yields
-  $2^d$ sections. Sections of size $> \tau$ are
+  $\{$vertical, $/$, horizontal, $\backslash\}$. Each axis-pair yields
+  a partition into $2^d$ sections, evaluated independently. Sections of
+  size $> \tau$ are
   solved by a greedy section solver in one of two complementary modes
   (selected per sweep by Phase 4):
   - **min-max**: at each step, append the city minimising the running
