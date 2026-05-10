@@ -2,9 +2,9 @@
 
 ### 1.1  Setting
 
-Given $n$ cities $C = \{c_1, \dots, c_n\} \subset \mathbb{R}^2$, a *tour*
+Given $n$ cities $C = \lbrace c_1, \dots, c_n \rbrace \subset \mathbb{R}^2$, a *tour*
 is a cyclic permutation $\pi$ of $C$, and its length is
-$L(\pi) = \sum_i \|c_{\pi(i)} - c_{\pi(i+1)}\|_2$ (indices mod $n$).
+$L(\pi) = \sum_i \Vert c_{\pi(i)} - c_{\pi(i+1)} \Vert_2$ (indices mod $n$).
 Euclidean TSP asks for an $L$-minimum tour. The decision form is
 NP-Complete [5]; the optimisation form is NP-Hard. The exact Held–Karp
 DP [6] runs in $O(n^2 \cdot 2^n)$ time and is feasible only for small
@@ -33,9 +33,9 @@ The algorithm is structured in four phases:
   perpendicular axes from the rotated frame at angle $\theta$ — the
   primary axis governs the top-level split, the secondary axis the next
   level, alternating thereafter). The four pairs are taken from
-  $\{\text{vertical},\ /,\ \text{horizontal},\ \backslash\}$. Each axis-pair
+  $\lbrace \text{vertical},\ /,\ \text{horizontal},\ \backslash \rbrace$. Each axis-pair
   yields a partition into $2^d$ sections, evaluated independently.
-  Sections of size $> \tau$ are
+  Sections of size $\gt \tau$ are
   solved by a greedy section solver in one of two complementary modes
   (selected per sweep by Phase 4):
   - **min-max**: at each step, append the city minimising the running

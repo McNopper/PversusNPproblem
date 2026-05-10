@@ -30,7 +30,7 @@ this work makes **no claim** of resolving $\mathcal{P}$ versus
 $\mathcal{NP}$ [1, 2, 3], and offers no approximation ratio (unlike
 Christofides [8] for metric TSP or Arora [11] for Euclidean TSP).
 
-On a battery of 14 instances ($n \in \{12, 14, 16\}$) including zigzag,
+On a battery of 14 instances ($n \in \lbrace 12, 14, 16 \rbrace$) including zigzag,
 comb, interleaved, concentric-ring, and uniform configurations, SiftTSP
 matches Held–Karp on most structured inputs and beats 2-opt on the
 rotationally symmetric `rings-12` and `rings-14` instances despite not

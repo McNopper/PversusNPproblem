@@ -10,7 +10,7 @@ We compare SiftTSP (`SiftTSP.py`, entry point `sift_tsp`) against:
 - **Nearest-Neighbor (NN)**: classic $O(n^2)$ greedy construction.
 - **2-opt**: 2-opt local search starting from the NN tour.
 
-SiftTSP is run with $\tau = 6$ and $d_{\max} \in \{1, 2, 3\}$.
+SiftTSP is run with $\tau = 6$ and $d_{\max} \in \lbrace 1, 2, 3 \rbrace$.
 The optimality gap is $(L / L^{\star} - 1) \times 100\%$ where $L^{\star}$ is the
 Held–Karp optimum.
 
@@ -68,7 +68,7 @@ $L^{\star} = 29.7823$.
 | SiftTSP, $d=3$, $\tau=6$ | 30.7478 | $+3.24\%$ |
 
 **Proposition 1 (Non-exactness).** *SiftTSP with $\tau = 6$ and any
-$d \in \{1, 2, 3\}$ is not exact on the Euclidean TSP.*
+$d \in \lbrace 1, 2, 3 \rbrace$ is not exact on the Euclidean TSP.*
 *Proof.* The 12-point instance `RINGS_12` in `counterexample.py` is a
 witness: Held–Karp's optimum has length $29.7823$, while SiftTSP at
 $d=1,2$ returns $31.7503$ and at $d=3$ returns $30.7478$, all strictly
@@ -108,7 +108,7 @@ Each instance is run on a single fixed seed; we report descriptive
 findings, not statistical claims.
 
 1. **Structured inputs are matched.** On zigzag, comb, and interleaved
-   instances ($n \in \{12, 14, 16\}$), SiftTSP at $d \geq 2$ matches
+   instances ($n \in \lbrace 12, 14, 16 \rbrace$), SiftTSP at $d \geq 2$ matches
    Held–Karp in every tested case, including instances where NN has
    gaps up to $+38\%$.
 2. **Two rotationally symmetric inputs are not matched, but 2-opt is
@@ -118,7 +118,7 @@ findings, not statistical claims.
    pattern holds on a wider population of rotationally symmetric
    instances.
 3. **Increasing depth is not monotone.** On `uniform-12`, $d{=}2$ gives
-   $+5.46\%$ while $d \in \{1, 3\}$ are exact. Finer subdivision can
+   $+5.46\%$ while $d \in \lbrace 1, 3 \rbrace$ are exact. Finer subdivision can
    split clusters that the optimum traverses contiguously.
 
 ### 2.5  Discussion
