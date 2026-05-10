@@ -85,7 +85,7 @@ algorithm that, for each $D \in \mathcal{D}$, solves every component
 optimally as an open path and then optimally chains those paths into a
 closed tour, finally returning the shortest tour across all
 $D \in \mathcal{D}$. If the global optimum $\pi^*$ is not
-"component-contiguous" for any $D \in \mathcal{D}$ — i.e.\ for every
+"component-contiguous" for any $D \in \mathcal{D}$ — that is, for every
 $D$, some component of $D$ is entered and left more than once by
 $\pi^*$ — then no chaining can recover $\pi^*$, and the algorithm's
 output is strictly longer than $L(\pi^*)$.*

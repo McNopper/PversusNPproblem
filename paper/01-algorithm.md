@@ -208,12 +208,13 @@ balanced. $\square$
 
 **Lemma 2 (Section solving).** With $k = 2^d$ and balanced bisection
 (Lemma 1), processing all sections takes $O(1)$ time when every section
-has $\leq \tau$ cities (i.e.\ when $\lceil n/k \rceil \leq \tau$), and
+has $\leq \tau$ cities (that is, when $\lceil n/k \rceil \leq \tau$), and
 $O(n^2 / k)$ time otherwise; the mixed regime is bounded by the larger.
-*Proof.* Brute force on a section of $\leq \tau$ cities is $O(\tau!)
-= O(1)$, and there are at most $k = O(1)$ such sections, giving $O(1)$
-total. For the greedy branch, each section has size $s_i \leq \lceil
-n/k \rceil$ by balanced bisection, and the $O(s_i^2)$ greedy solver
+*Proof.* Brute force on a section of $\leq \tau$ cities is
+$O(\tau!) = O(1)$, and there are at most $k = O(1)$ such sections,
+giving $O(1)$ total. For the greedy branch, each section has size
+$s_i \leq \lceil n/k \rceil$ by balanced bisection, and the $O(s_i^2)$
+greedy solver
 gives total cost $\sum_i s_i^2 \leq k \cdot (n/k)^2 = n^2/k$. $\square$
 
 **Lemma 3 (Connection).** For fixed $d$ (hence fixed $k = 2^d$),
@@ -231,14 +232,14 @@ both $O(n)$ operations. $\square$
 SiftTSP runs in $O(n^2)$ time on every input.*
 
 *Proof.* Phase 1 costs $O(n^2)$ (Lemma 4). Each `EvalAt` invocation
-costs $O(n \log n)$ for `Subdivide` (Lemma 1), $O(n^2/k)$ for section
+loops over the four axis-pairs (§1.4), each costing
+$O(n \log n)$ for `Subdivide` (Lemma 1), $O(n^2/k)$ for section
 solving (Lemma 2; $O(1)$ in the bounded-$n$ all-exact regime), and
-$O(n)$ for `BruteForceConnect` (Lemma 3); together $O(n^2)$. The number
-of `EvalAt` invocations per `SandclockSweep` is
-$O(d_{\max} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) \cdot 4 =
-O(1)$. The total number of sweeps in Phase 4 is bounded by
-$d_{\text{ceiling}} \cdot 8 \cdot
-(\log m_{\text{ceiling}} + \log s_{\text{ceiling}} + 1) = O(1)$,
+$O(n)$ for `BruteForceConnect` (Lemma 3); together $O(n^2)$ per
+`EvalAt`. The number of `EvalAt` invocations per `SandclockSweep`
+is $O(d_{\max} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) = O(1)$.
+The total number of sweeps in Phase 4 is bounded by
+$d_{\text{ceiling}} \cdot 8 \cdot (\log m_{\text{ceiling}} + \log s_{\text{ceiling}} + 1) = O(1)$,
 because both ceilings double on improvement and at most 8 consecutive
 non-improving sweeps occur at any rung. Multiplying gives $O(n^2)$.
 $\square$
@@ -249,11 +250,11 @@ is not exact in general.
 
 **Remark (sharper bounds in sub-regimes).** Phase 1 dominates the
 worst-case bound. If Phase 1 were replaced by an $O(n \log n)$
-implementation (e.g.\ via a $k$-d tree for farthest-point queries), and
+implementation (for example via a $k$-d tree for farthest-point queries), and
 if $n$ is small enough that every section is brute-forced
 ($\lceil n / 2^{d_{\text{ceiling}}} \rceil \leq \tau$), the overall
 complexity would drop to $O(n \log n)$. With fixed parameters that
 regime is reached only for $n \leq \tau \cdot 2^{d_{\text{ceiling}}}$,
-i.e.\ $n$ bounded by a constant, in which case the entire algorithm is
+that is, $n$ bounded by a constant, in which case the entire algorithm is
 trivially $O(1)$. We therefore report the honest worst-case bound
 $O(n^2)$.
