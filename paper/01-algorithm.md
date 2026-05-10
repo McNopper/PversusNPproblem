@@ -237,7 +237,8 @@ $O(n \log n)$ for `Subdivide` (Lemma 1), $O(n^2/k)$ for section
 solving (Lemma 2; $O(1)$ in the bounded-$n$ all-exact regime), and
 $O(n)$ for `BruteForceConnect` (Lemma 3); together $O(n^2)$ per
 `EvalAt`. The number of `EvalAt` invocations per `SandclockSweep`
-is $O(d_{\max} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) = O(1)$.
+is $O(d_{\max} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) \leq
+O(d_{\text{ceiling}} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) = O(1)$.
 The total number of sweeps in Phase 4 is bounded by
 $d_{\text{ceiling}} \cdot 8 \cdot (\log m_{\text{ceiling}} + \log s_{\text{ceiling}} + 1) = O(1)$,
 because both ceilings double on improvement and at most 8 consecutive
