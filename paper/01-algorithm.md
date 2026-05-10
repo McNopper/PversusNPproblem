@@ -145,7 +145,7 @@ procedure EvalAt(C, d, theta, tau, mode, best, best_len):
     return (best, best_len, hit)
 ```
 
-The reference implementation is `tsp.py`; entry point `sift_tsp`.
+The reference implementation is `SiftTSP.py`; entry point `sift_tsp`.
 
 ### 1.5  Complexity
 

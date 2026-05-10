@@ -6,7 +6,7 @@ A deterministic, polynomial-time **heuristic** for the Euclidean
 Travelling Salesman Problem, based on recursive geometric bisection.
 Entry point: `sift_tsp`.
 
-Architecture (full prose: ALGORITHM.md, paper/):
+Architecture (full prose: paper/):
 
     Phase 1  max         worst-case greedy-longest start (once)
     Phase 2  sift        sandclock depth schedule + mill (breadth)

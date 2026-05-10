@@ -1,5 +1,5 @@
 """
-Adversarial test harness for tsp.
+Adversarial test harness for SiftTSP.
 
 We construct city configurations specifically designed to defeat fixed
 geometric bisection:
@@ -10,14 +10,14 @@ geometric bisection:
   4. concentric rings (no preferred axis)
   5. random Euclidean instances (control)
 
-For each, we compare tsp against:
+For each, we compare SiftTSP against:
   - Held-Karp (exact, ground truth)
   - Nearest-Neighbor (NN)
   - 2-opt (NN + 2-opt)
-  - tsp with depth in {1, 2, 3} and bf_threshold = 6
+  - SiftTSP with depth in {1, 2, 3} and bf_threshold = 6
 
-A failure of tsp to match the Held-Karp optimum on any instance
-constitutes a counterexample to its claimed exactness.
+A failure of SiftTSP to match the Held-Karp optimum on any instance
+constitutes a counterexample to exactness.
 """
 
 import math

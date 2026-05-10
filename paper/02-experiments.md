@@ -4,7 +4,7 @@
 
 All experiments use the Euclidean distance metric. Optimal tours are
 computed by the exact Held–Karp DP [7] (feasible up to $n \approx 20$).
-We compare SiftTSP (`tsp.py`, entry point `sift_tsp`) against:
+We compare SiftTSP (`SiftTSP.py`, entry point `sift_tsp`) against:
 
 - **Held–Karp**: exact $O(n^2 \cdot 2^n)$ DP — ground-truth optimum.
 - **Nearest-Neighbor (NN)**: classic $O(n^2)$ greedy construction.
@@ -15,7 +15,7 @@ The optimality gap is $(L / L^* - 1) \times 100\%$ where $L^*$ is the
 Held–Karp optimum.
 
 Reproduce with:
-```bash
+```powershell
 $env:PYTHONIOENCODING="utf-8"; python -m tests.adversarial   # full battery
 $env:PYTHONIOENCODING="utf-8"; python counterexample.py      # canonical counterexample
 ```
@@ -43,7 +43,7 @@ Instance families designed to probe geometric-bisection weaknesses:
 | interleaved-14   | 14 | **0.00** | **0.00** | *31.41*  | **0.00** | **0.00** |
 | comb-12          | 12 | **0.00** | **0.00** | **0.00** | **0.00** | **0.00** |
 | comb-14          | 14 | **0.00** | **0.00** | *25.98*  | **0.00** | **0.00** |
-| **rings-12**     | 12 | 17.63    | 17.63    | *6.82*   | *6.73*   | *3.24*   |
+| **rings-12**     | 12 | 17.63    | 17.63    | *6.61*   | *6.61*   | *3.24*   |
 | **rings-14**     | 14 | 8.58     | 8.58     | *26.06*  | *3.82*   | *1.52*   |
 | uniform-12       | 12 | 12.20    | **0.00** | **0.00** | *5.46*   | **0.00** |
 | uniform-14       | 14 | 30.36    | **0.00** | *15.32*  | *1.47*   | *1.47*   |

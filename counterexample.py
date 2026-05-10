@@ -1,6 +1,5 @@
 """
-Canonical counterexample to exactness of the geometric-subdivision
-heuristic (`tsp.py`, Algorithm 4).
+Canonical counterexample to exactness of SiftTSP (`SiftTSP.py`).
 
 The 12-point concentric-rings instance below is solved sub-optimally
 by the algorithm at every tested depth d in {1, 2, 3} with bf_threshold = 6.
@@ -12,7 +11,7 @@ SiftTSP d=3, t=6                                : 30.7478  (+3.24%)
 
 This refutes the empirical claim that the algorithm is exact for all
 tested small instances, and supports the structural argument of
-Section 6.2 (Proposition 2) that fixed geometric bisection cannot, in
+Proposition 2 (paper §2.3) that fixed geometric bisection cannot, in
 general, recover an optimal Euclidean tour.
 
 Run:
