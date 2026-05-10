@@ -24,11 +24,11 @@ $env:PYTHONIOENCODING="utf-8"; python counterexample.py      # canonical counter
 
 Instance families designed to probe geometric-bisection weaknesses:
 
-- **zigzag**-$n$: $n$ points alternating across a vertical axis.
-- **interleaved**-$n$: two clusters with interleaved indices.
-- **comb**-$n$: a spine with vertical teeth.
-- **rings**-$n$: two concentric rings — no axis is preferred.
-- **uniform**-$n$: uniform random control.
+- **zigzag**-*n*: $n$ points alternating across a vertical axis.
+- **interleaved**-*n*: two clusters with interleaved indices.
+- **comb**-*n*: a spine with vertical teeth.
+- **rings**-*n*: two concentric rings — no axis is preferred.
+- **uniform**-*n*: uniform random control.
 
 **Table 1.** Optimality gap (%) — **bold = exact**, *italic = sub-optimal*.
 
