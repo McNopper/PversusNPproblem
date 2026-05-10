@@ -8,7 +8,7 @@ $L(\pi) = \sum_i \|c_{\pi(i)} - c_{\pi(i+1)}\|_2$ (indices mod $n$).
 Euclidean TSP asks for an $L$-minimum tour. The decision form is
 NP-Complete [5]; the optimization form is NP-Hard. The exact Held–Karp
 DP [6] runs in $O(n^2 \cdot 2^n)$ time and is feasible only for small
-$n$.SiftTSP is a polynomial-time *heuristic* — it is not exact, see
+$n$. SiftTSP is a polynomial-time *heuristic* — it is not exact, see
 §2.3.
 
 ### 1.2  Parameters and Phases
@@ -34,7 +34,7 @@ The algorithm is structured in four phases:
   primary axis governs the top-level split, the secondary axis the next
   level, alternating thereafter). The four pairs are taken from
   $\{$vertical, $/$, horizontal, $\backslash\}$. The partition yields
-  $2^d$ sections.Sections of size $> \tau$ are
+  $2^d$ sections. Sections of size $> \tau$ are
   solved by a greedy section solver in one of two complementary modes
   (selected per sweep by Phase 4):
   - **min-max**: at each step, append the city minimising the running

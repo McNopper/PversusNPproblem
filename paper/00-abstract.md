@@ -27,7 +27,7 @@ $+3.24\%$ at $d=3$. The structural reason is identified as
 decompositions can recover an optimal tour that interleaves cities
 across components of every decomposition in the family. Consequently
 this work makes **no claim** of resolving $\mathcal{P}$ versus
-$\mathcal{NP}$, and offers no approximation ratio (unlike
+$\mathcal{NP}$ [1,2,3], and offers no approximation ratio (unlike
 Christofides [8] for metric TSP or Arora [11] for Euclidean TSP).
 
 On a battery of 14 instances ($n \in \{12, 14, 16\}$) including zigzag,
