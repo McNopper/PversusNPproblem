@@ -67,12 +67,12 @@ schedule) the angular axis is searched with two complementary sweeps:
   $0, \pm\alpha_d/3, \pm 2\alpha_d/3, \ldots$ where
   $\alpha_d = \pi / 2^d$, capped at $m$ third-steps per direction.
 - **Sieve (depth).** Damped forth-and-back oscillation around the best
-  angle $\theta^*$ found by the mill, with amplitudes
-  $\alpha_{d^*}/6, \alpha_{d^*}/12, \alpha_{d^*}/24, \ldots$ — a
+  angle $\theta^{\star}$ found by the mill, with amplitudes
+  $\alpha_{d^{\star}}/6, \alpha_{d^{\star}}/12, \alpha_{d^{\star}}/24, \ldots$ — a
   hand-fan rather than a full revolution — capped at $s$ halvings.
 
 For each evaluated $(d, \theta)$ and for each of the four axis pairs
-(vertical, $/$, horizontal, $\backslash$):
+$(\text{vertical},\ /,\ \text{horizontal},\ \backslash)$:
 
 1. **Subdivide** the city set into $2^d$ sections by recursive bisection.
 2. **Solve each section** by an open Hamiltonian path:

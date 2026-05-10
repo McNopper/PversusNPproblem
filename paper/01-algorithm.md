@@ -25,7 +25,7 @@ SiftTSP is controlled by four constants treated as fixed:
 The algorithm is structured in four phases:
 
 - **Phase 1 (max).** A worst-case greedy-longest tour, computed once,
-  fixes an initial upper bound $B_0 \geq L^*$ that the rest only lowers.
+  fixes an initial upper bound $B_0 \geq L^{\star}$ that the rest only lowers.
 - **Phase 2 (sift).** At each depth $d$ on the sandclock schedule
   $1, 2, \dots, d_{\max}, \dots, 2, 1$ and at each angle $\theta$ in the
   current mill+sieve schedule, the city set is partitioned by recursive
@@ -33,9 +33,9 @@ The algorithm is structured in four phases:
   perpendicular axes from the rotated frame at angle $\theta$ — the
   primary axis governs the top-level split, the secondary axis the next
   level, alternating thereafter). The four pairs are taken from
-  $\{$vertical, $/$, horizontal, $\backslash\}$. Each axis-pair yields
-  a partition into $2^d$ sections, evaluated independently. Sections of
-  size $> \tau$ are
+  $\{\text{vertical},\ /,\ \text{horizontal},\ \backslash\}$. Each axis-pair
+  yields a partition into $2^d$ sections, evaluated independently.
+  Sections of size $> \tau$ are
   solved by a greedy section solver in one of two complementary modes
   (selected per sweep by Phase 4):
   - **min-max**: at each step, append the city minimising the running
@@ -51,9 +51,9 @@ The algorithm is structured in four phases:
 The angular dimension uses two complementary sweeps. The **mill** is a
 uniform third-step rotation across $[0, \pi/2)$ in both directions
 (breadth). The **sieve** is a damped forth-and-back oscillation around
-the best $(\theta^*, d^*)$ found by the mill, with amplitudes
+the best $(\theta^{\star}, d^{\star})$ found by the mill, with amplitudes
 $\tfrac{s_0}{2}, \tfrac{s_0}{4}, \dots, \tfrac{s_0}{2^{s}}$ where
-$s_0 = (\pi / 2^{d^*}) / 3$ (depth). Mill and sieve refine the
+$s_0 = (\pi / 2^{d^{\star}}) / 3$ (depth).Mill and sieve refine the
 *same* angular axis at different scales; together they sift the search
 through both wide and narrow neighbourhoods of every depth.
 

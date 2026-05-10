@@ -11,7 +11,7 @@ We compare SiftTSP (`SiftTSP.py`, entry point `sift_tsp`) against:
 - **2-opt**: 2-opt local search starting from the NN tour.
 
 SiftTSP is run with $\tau = 6$ and $d_{\max} \in \{1, 2, 3\}$.
-The optimality gap is $(L / L^* - 1) \times 100\%$ where $L^*$ is the
+The optimality gap is $(L / L^{\star} - 1) \times 100\%$ where $L^{\star}$ is the
 Held–Karp optimum.
 
 Reproduce with:
@@ -58,7 +58,7 @@ points of radius $\approx 4$ both centred at $(5,5)$, is materialised
 verbatim in `counterexample.py`.
 
 **Table 2.** Counterexample `rings-12` — Held–Karp optimum
-$L^* = 29.7823$.
+$L^{\star} = 29.7823$.
 
 | Algorithm | Length $L$ | Gap |
 |:---|:---:|:---:|
@@ -84,16 +84,16 @@ point set $C$, each partitioning $C$ into components, and consider any
 algorithm that, for each $D \in \mathcal{D}$, solves every component
 optimally as an open path and then optimally chains those paths into a
 closed tour, finally returning the shortest tour across all
-$D \in \mathcal{D}$. If the global optimum $\pi^*$ is not
+$D \in \mathcal{D}$. If the global optimum $\pi^{\star}$ is not
 "component-contiguous" for any $D \in \mathcal{D}$ — that is, for every
 $D$, some component of $D$ is entered and left more than once by
-$\pi^*$ — then no chaining can recover $\pi^*$, and the algorithm's
-output is strictly longer than $L(\pi^*)$.*
+$\pi^{\star}$ — then no chaining can recover $\pi^{\star}$, and the algorithm's
+output is strictly longer than $L(\pi^{\star})$.*
 
 This applies to SiftTSP because the family $\mathcal{D}$ it explores
 (median bisections at depths $1, \dots, d_{\max}$ along finitely many
 rotated axes and four axis-pairs) is *fixed* and does not depend on
-$\pi^*$. The `rings-12` Held–Karp optimum is empirically
+$\pi^{\star}$. The `rings-12` Held–Karp optimum is empirically
 non-contiguous with respect to every $D$ tried at $d \leq 3$ (any
 straight-line bisection separates the two rings or cuts them in two
 diametrically opposed half-rings, while the optimum alternates between
