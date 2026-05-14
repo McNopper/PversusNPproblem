@@ -4,16 +4,47 @@ A deterministic, polynomial-time **heuristic** for the Euclidean Travelling
 Salesman Problem (TSP), built around recursive geometric bisection with a
 *sandclock* depth schedule and a *mill + sieve* angular search.
 
-## What is in this repository
+## Overview
+
+SiftTSP partitions the city set by recursive geometric bisection into $2^d$
+sections, solves small sections by brute force and larger ones by a
+complementary pair of greedy rules (min-max / max-min), and reconnects the
+section paths by exhaustive search over orderings and orientations. The
+angular dimension of the search is covered by two complementary sweeps — a
+uniform *mill* (breadth) and a damped fan-shaped *sieve* (depth) —
+coordinated by a *sandclock* depth schedule $1 \to d_{\max} \to 1$ and an
+8-state super-cycle over (section-mode, mill-direction, ordering).
+
+- **Runtime:** $O(n^2)$ for fixed parameters.
+- **Not exact:** [`counterexample.py`](counterexample.py) is a canonical
+  12-point witness (`rings-12`) on which the algorithm misses the
+  Held–Karp optimum at every tested depth.
+- **Empirically:** matches Held–Karp on most structured inputs in the
+  adversarial battery (zigzag, comb, interleaved) and beats 2-opt on the
+  rotationally symmetric `rings-12` / `rings-14` instances.
+
+## Paper
+
+The full scientific write-up — definitions, pseudocode, complexity proof
+(Theorem 1), experimental battery, counterexample and discussion of
+*decomposition irrecoverability* — is available as a single PDF:
+
+**📄 [`paper/SiftTSP.pdf`](paper/SiftTSP.pdf)**
+
+LaTeX source: [`paper/SiftTSP.tex`](paper/SiftTSP.tex). The original
+markdown sections used to assemble it are kept alongside in
+[`paper/`](paper) for diff-friendly editing.
+
+## Repository layout
 
 - **[`SiftTSP.py`](SiftTSP.py)** — the algorithm (entry point: `sift_tsp`).
-- **[`paper/`](paper)** — the full scientific write-up (definitions,
-  pseudocode, complexity proof, experimental battery, discussion).
+- **[`paper/`](paper)** — the scientific write-up (PDF, LaTeX, markdown
+  sources).
 - **[`counterexample.py`](counterexample.py)** — the canonical 12-point
   instance on which the algorithm misses the optimum, with literal
   coordinates and a self-contained verification harness.
-- **[`tests/`](tests)** — Held–Karp / nearest-neighbor / 2-opt baselines and
-  the adversarial test battery used in paper §2.
+- **[`tests/`](tests)** — Held–Karp / nearest-neighbor / 2-opt baselines
+  and the adversarial test battery used in paper §2.
 
 ## How to run
 
@@ -30,11 +61,9 @@ python counterexample.py
 python -m tests.adversarial
 ```
 
-## Algorithm
+## Entry point
 
-Entry point: `sift_tsp(cities, d_ceiling, n_rot_ceiling, n_sift_ceiling, bf_threshold)`.
-
-### Inputs
+`sift_tsp(cities, d_ceiling, n_rot_ceiling, n_sift_ceiling, bf_threshold)`
 
 | Input | Paper symbol | Meaning |
 |---|---|---|
@@ -44,117 +73,9 @@ Entry point: `sift_tsp(cities, d_ceiling, n_rot_ceiling, n_sift_ceiling, bf_thre
 | `n_sift_ceiling` | $s_{\text{ceiling}}$ | Sieve (depth) cap: halvings of the damped fan around the mill's best angle |
 | `bf_threshold` | $\tau$ | Section size at or below which we solve exactly by brute force |
 
-### Four phases
-
-The criterion used to pick the next city tightens monotonically across the
-phases:
-
-$$
-\text{max} \;\longrightarrow\; \{\text{min-max} \mid \text{max-min}\}
-\;\longrightarrow\; \text{min} \;\longrightarrow\; \text{loop}
-$$
-
-**Phase 1 — Max (worst-case start, once).**
-Construct a deliberately bad initial tour by greedy *farthest*-next
-insertion. The resulting length is a guaranteed upper bound that the
-rest of the algorithm only ever lowers.
-
-**Phase 2 — Sift (one sandclock sweep, mill + sieve).**
-At depths $d = 1, 2, \ldots, d_{\max}, \ldots, 2, 1$ (the *sandclock*
-schedule) the angular axis is searched with two complementary sweeps:
-
-- **Mill (breadth).** Uniform third-step sweep at angles
-  $0, \pm\alpha_d/3, \pm 2\alpha_d/3, \ldots$ where
-  $\alpha_d = \pi / 2^d$, capped at $m$ third-steps per direction.
-- **Sieve (depth).** Damped forth-and-back oscillation around the best
-  angle $\theta^{\star}$ found by the mill, with amplitudes
-  $\alpha_{d^{\star}}/6, \alpha_{d^{\star}}/12, \alpha_{d^{\star}}/24, \ldots$ — a
-  hand-fan rather than a full revolution — capped at $s$ halvings.
-
-For each evaluated $(d, \theta)$ and for each of the four axis pairs
-$(\text{vertical},\ /,\ \text{horizontal},\ \backslash)$:
-
-1. **Subdivide** the city set into $2^d$ sections by recursive bisection.
-2. **Solve each section** by an open Hamiltonian path:
-   - if $|S| \leq \tau$: exact brute-force enumeration (Phase 3);
-   - else: a greedy rule (`min-max` *or* `max-min`, chosen by Phase 4):
-     - `min-max` picks at each step the city that minimises the largest
-       edge so far on the path;
-     - `max-min` picks at each step the city that maximises the smallest
-       edge so far.
-3. **Reconnect** the $2^d$ section paths into a closed tour by exhaustive
-   $(2^d - 1)! \cdot 2^{2^d - 1}$ search over orderings and orientations.
-
-The shortest tour seen across the sweep is kept.
-
-**Phase 3 — Min (exact local solve).**
-As $d$ grows, sections shrink. Once a section has at most $\tau$ cities it
-is solved *exactly* by brute force — the true minimum on that section.
-
-**Phase 4 — Loop (convergence-driven outer schedule).**
-Phase 2 sweeps are repeated at increasing parameters. Each sweep is
-configured by a triple $(\text{mode}, \text{direction}, \text{ordering})$
-giving an 8-state super-cycle:
-
-| $k$ | mode | direction | ordering |
-|---|---|---|---|
-| 0 | max-min | CW | MD |
-| 1 | min-max | CW | MD |
-| 2 | max-min | CCW | MD |
-| 3 | min-max | CCW | MD |
-| 4 | max-min | CW | DM |
-| 5 | max-min | CCW | DM |
-| 6 | min-max | CW | DM |
-| 7 | min-max | CCW | DM |
-
-Transition rule between sweeps:
-
-- *Mill improvement:* double the mill cap, $m \leftarrow 2m$.
-- *Sieve improvement:* double the sieve cap, $s \leftarrow 2s$.
-- After each sweep, advance $k$ to the next super-cycle position.
-- *No improvement:* advance $k$ and retry.
-- *Eight consecutive non-improving sweeps:* bump $d_{\max} \leftarrow d_{\max} + 1$,
-  reset $m \leftarrow 1$, $s \leftarrow 1$, $k \leftarrow 0$, return to Phase 2.
-
-Termination: when $d_{\max}$ reaches `d_ceiling` and the super-cycle
-converges again. Tour length is monotone non-increasing, so termination is
-guaranteed.
-
-### Complexity
-
-For fixed `d_ceiling`, `n_rot_ceiling`, `n_sift_ceiling`, `bf_threshold`:
-
-| Component | Worst-case cost |
-|---|---|
-| Phase 1 (worst-case greedy-longest start) | $O(n^2)$ |
-| Per `EvalAt` (subdivide + section solve + connect) | $O(n^2)$ |
-| Number of `EvalAt` calls | $O(1)$ |
-| **Total** | **$O(n^2)$** |
-
-Polynomial in all regimes. The dominant cost is Phase 1's pairwise
-farthest-point scans; a $k$-d-tree implementation would reduce this to
-$O(n \log n)$. See [`paper/01-algorithm.md`](paper/01-algorithm.md) §1.6
-for the proof (Theorem 1).
-
-### Limitation
-
-The algorithm is not exact. The 12-point instance in
-[`counterexample.py`](counterexample.py) is the canonical witness. See
-[`paper/02-experiments.md`](paper/02-experiments.md) §2.3 for the
-structural reason (decomposition irrecoverability: a fixed family of
-geometric bisections cannot recover an optimum that interleaves cities
-across components of every member of the family).
-
-## The paper
-
-A compact write-up in Springer LNCS style lives in [`paper/`](paper):
-
-| Section | Content |
-|---|---|
-| [Abstract](paper/00-abstract.md) | Title, abstract, keywords |
-| [1 · Algorithm & Complexity](paper/01-algorithm.md) | Setting, parameters, four phases, pseudocode, $O(n^2)$ proof |
-| [2 · Experiments](paper/02-experiments.md) | Battery, counterexample, discussion |
-| [References](paper/03-references.md) | Bibliography |
+For the algorithm's four phases, the 8-state super-cycle, the $O(n^2)$
+complexity proof, and the structural counterexample, see
+[`paper/SiftTSP.pdf`](paper/SiftTSP.pdf).
 
 ## License
 
