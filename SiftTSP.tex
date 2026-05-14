@@ -23,7 +23,7 @@
 \newcommand{\bigO}{\mathcal{O}}
 
 \title{SiftTSP: A Geometric Sandclock-Sift Heuristic\\ for Euclidean TSP}
-\author{}
+\author{Norbert Nopper}
 \date{}
 
 \begin{document}
@@ -76,10 +76,13 @@ Given $n$ cities $C = \{c_1, \dots, c_n\} \subset \mathbb{R}^2$, a
 \emph{tour} is a cyclic permutation $\pi$ of $C$, and its length is
 $L(\pi) = \sum_i \Vert c_{\pi(i)} - c_{\pi(i+1)} \Vert_2$ (indices
 $\bmod\ n$). Euclidean TSP asks for an $L$-minimum tour. The decision
-form is NP-Complete~\cite{karp1972}; the optimisation form is NP-Hard. The exact
-Held--Karp DP~\cite{heldkarp1962} runs in $O(n^2 \cdot 2^n)$ time and is feasible only
-for small $n$. SiftTSP is a polynomial-time \emph{heuristic} --- it is
-not exact, see \S2.3.
+form of general (metric) TSP is NP-Complete by Karp's reduction from
+Hamiltonian Cycle~\cite{karp1972}; Papadimitriou~\cite{papadimitriou1977}
+established that the restriction to Euclidean instances in the plane is
+also NP-Complete, hence the optimisation form is NP-Hard. The exact
+Held--Karp DP~\cite{heldkarp1962} runs in $O(n^2 \cdot 2^n)$ time and is
+feasible only for small $n$. SiftTSP is a polynomial-time
+\emph{heuristic} --- it is not exact, see \S2.3.
 
 \subsection{Parameters and Phases}
 
@@ -133,6 +136,13 @@ orientations.
 search.
 \end{itemize}
 
+Both greedy rules are seeded at the first city in the section's input
+ordering and extend the path one vertex at a time; consequently SiftTSP
+is deterministic but its output depends on the order in which the
+cities are presented (the partitioning, the section orderings inside
+each partition, and the brute-force fall-backs all inherit this
+order-dependence).
+
 The angular dimension uses two complementary sweeps. The \textbf{mill}
 is a uniform third-step rotation across $[0, \pi/2)$ in both directions
 (breadth). The \textbf{sieve} is a damped forth-and-back oscillation
@@ -182,9 +192,16 @@ bump $d_{\max} \leftarrow d_{\max} + 1$, reset $m, s, k$ to $1, 1, 0$,
 and restart Phase~2.
 \end{enumerate}
 
-The loop terminates when $d_{\max}$ reaches $d_{\text{ceiling}}$ and the
-super-cycle converges. Tour length is bounded below by OPT and is
-monotone non-increasing across the loop, so termination is guaranteed.
+\paragraph{Termination.} Inside a fixed $d_{\max}$, the inner
+\texttt{while} loop runs at most $\lfloor \log_2 m_{\text{ceiling}}
+\rfloor + \lfloor \log_2 s_{\text{ceiling}} \rfloor + 8$ sweeps: $m$
+doubles at most $\lfloor \log_2 m_{\text{ceiling}} \rfloor$ times
+before saturating and likewise for $s$, after which the loop must hit
+8 consecutive non-improving sweeps and break. The outer \texttt{for}
+loop runs over $d_{\max} = 1, \dots, d_{\text{ceiling}}$. Hence the
+total number of sweeps is finite. The running best is updated only when
+strictly improved, so the returned tour has length monotone
+non-increasing in the execution trace and is bounded below by $0$.
 
 \subsection{Pseudocode}
 
@@ -283,7 +300,7 @@ direction (CW / CCW), and visit ordering (MD / DM), with independent
 doubling caps on mill and sieve that grow only on improvement.
 \end{enumerate}
 
-To the authors' knowledge this specific orchestration is new, but each
+To the author's knowledge this specific orchestration is new, but each
 individual primitive (recursive median bisection, exhaustive sub-tour
 chaining, greedy section solvers, rotational axis search) is standard.
 We therefore frame SiftTSP as a \textbf{deterministic, reproducible,
@@ -306,18 +323,21 @@ the median, so each level does $O(n \log n)$ comparison work in total.
 With $d$ fixed, total work is $O(n \log n)$. Median splits keep section
 sizes balanced. $\square$
 
-\paragraph{Lemma 2 (Section solving).} \textit{With $k = 2^d$ and
-balanced bisection (Lemma~1), processing all sections takes $O(1)$ time
-when every section has $\leq \tau$ cities (that is, when
-$\lceil n/k \rceil \leq \tau$), and $O(n^2 / k)$ time otherwise; the
-mixed regime is bounded by the larger.}
+\paragraph{Lemma 2 (Section solving).} \textit{Let $k = 2^d$ and assume
+the recursive median bisection of Lemma~1, so every section has size in
+$\{\lfloor n/k \rfloor, \lceil n/k \rceil\}$. Processing all sections
+takes $O(1)$ time when $\lceil n/k \rceil \leq \tau$ (every section is
+brute-forced), and $O(n^2 / k)$ time otherwise; the mixed regime
+(some brute-forced, some greedy) is bounded by the larger.}
 
 \textit{Proof.} Brute force on a section of $\leq \tau$ cities is
 $O(\tau!) = O(1)$, and there are at most $k = O(1)$ such sections,
 giving $O(1)$ total. For the greedy branch, each section has size
-$s_i \leq \lceil n/k \rceil$ by balanced bisection, and the $O(s_i^2)$
-greedy solver gives total cost $\sum_i s_i^2 \leq k \cdot (n/k)^2 = n^2/k$.
-$\square$
+$s_i \leq \lceil n/k \rceil$ by balanced bisection, and each greedy
+solver (\texttt{minmax\_path}, \texttt{maxmin\_path}) does an
+$O(s_i)$ scan at each of its $s_i$ steps, for $O(s_i^2)$ total per
+section. Summing, $\sum_i s_i^2 \leq k \cdot (\lceil n/k \rceil)^2 =
+O(n^2/k)$. $\square$
 
 \paragraph{Lemma 3 (Connection).} \textit{For fixed $d$ (hence fixed
 $k = 2^d$), \texttt{BruteForceConnect} runs in $O(n)$ time.}
@@ -395,6 +415,17 @@ $env:PYTHONIOENCODING="utf-8"; python counterexample.py      # canonical counter
 \end{verbatim}
 \end{small}
 
+\paragraph{Reproducibility.} All experiments run under CPython~3.11 (no
+third-party numerical libraries). The algorithm is deterministic given
+$(C, d_{\text{ceiling}}, \tau, m_{\text{ceiling}}, s_{\text{ceiling}})$
+and the city input ordering, with no randomised tie-breaking. Random
+instance families use \texttt{random.Random} with the following fixed
+seeds (\texttt{tests/adversarial.py}): \texttt{zigzag} = 0,
+\texttt{interleaved} = 1, \texttt{comb} = 2, \texttt{rings} = 3,
+\texttt{uniform-12/14/16} = 42/43/44. The deterministic instances
+(\texttt{rings-12} of \texttt{counterexample.py}) use literal
+coordinates listed in the source file.
+
 \subsection{Adversarial Battery}
 
 Instance families designed to probe geometric-bisection weaknesses:
@@ -470,32 +501,49 @@ length $29.7823$, while SiftTSP at $d=1,2$ returns $31.7503$ and at
 $d=3$ returns $30.7478$, all strictly greater. Values are reproducible
 by \texttt{python counterexample.py}. $\square$
 
-The following is the structural intuition for \emph{why} \texttt{rings-12}
-defeats the algorithm; it is an argument, not a formal proof of
-non-exactness (Proposition~1 above does that).
+The following is the structural reason \emph{why} \texttt{rings-12}
+defeats the algorithm. Proposition~1 above is empirical; Proposition~2
+below is a structural impossibility result that applies to a broad
+class of algorithms including SiftTSP.
 
-\paragraph{Argument (Decomposition irrecoverability).}
-\textit{Fix a finite family $\mathcal{D}$ of geometric decompositions
-of a point set $C$, each partitioning $C$ into components, and consider
-any algorithm that, for each $D \in \mathcal{D}$, solves every
-component optimally as an open path and then optimally chains those
-paths into a closed tour, finally returning the shortest tour across
-all $D \in \mathcal{D}$. If the global optimum $\pi^{\star}$ is not
-``component-contiguous'' for any $D \in \mathcal{D}$ --- that is, for
-every $D$, some component of $D$ is entered and left more than once by
-$\pi^{\star}$ --- then no chaining can recover $\pi^{\star}$, and the
-algorithm's output is strictly longer than $L(\pi^{\star})$.}
+\paragraph{Proposition 2 (Decomposition irrecoverability).}
+\textit{Let $C \subset \mathbb{R}^2$ be a finite point set and let
+$\mathcal{D}$ be a finite family of partitions of $C$, each
+$D \in \mathcal{D}$ a partition $C = S_1^D \sqcup \dots \sqcup S_{k_D}^D$
+into pairwise disjoint components. Consider any algorithm $\mathcal{A}$
+that, for each $D \in \mathcal{D}$, computes an open Hamiltonian path
+on each component of $D$ and then closes those paths into a tour by
+chaining them in some order with some orientation per path, and
+finally returns the shortest such candidate over all $D \in \mathcal{D}$
+and all chainings. Call a tour $\pi$ on $C$ \textbf{component-contiguous}
+for $D$ if, for every component $S_i^D$, the cities of $S_i^D$ occupy a
+contiguous arc of $\pi$. If for every $D \in \mathcal{D}$ the global
+optimum $\pi^{\star}$ fails to be component-contiguous for $D$, then
+$L(\mathcal{A}(C)) > L(\pi^{\star})$.}
 
-This applies to SiftTSP because the family $\mathcal{D}$ it explores
-(median bisections at depths $1, \dots, d_{\max}$ along finitely many
-rotated axes and four axis-pairs) is \emph{fixed} and does not depend
-on $\pi^{\star}$. The \texttt{rings-12} Held--Karp optimum is empirically
-non-contiguous with respect to every $D$ tried at $d \leq 3$ (any
-straight-line bisection separates the two rings or cuts them in two
-diametrically opposed half-rings, while the optimum alternates between
-inner and outer rings). Finer angular search adds resolution but does
-not change the decomposition primitive, so it cannot defeat the
-obstruction.
+\textit{Proof.} For a fixed $D \in \mathcal{D}$ every candidate tour
+considered by $\mathcal{A}$ visits each component on a single
+contiguous arc, by construction (the open Hamiltonian path of a
+component is contiguous, and chaining concatenates components without
+interleaving them). Hence every candidate is component-contiguous for
+$D$. By hypothesis $\pi^{\star}$ is not component-contiguous for any
+$D \in \mathcal{D}$, so $\pi^{\star}$ is never among the candidates,
+and $\mathcal{A}(C)$ --- the minimum over the candidates --- has length
+strictly greater than $L(\pi^{\star})$ unless some non-optimal candidate
+happens to have length exactly $L(\pi^{\star})$. In the Euclidean
+generic position (no two distinct tours have equal length) this
+exception is empty. $\square$
+
+Proposition~2 applies to SiftTSP because the family $\mathcal{D}$ it
+explores (median bisections at depths $1, \dots, d_{\max}$ along
+finitely many rotated axes and four axis-pairs) is \emph{fixed in
+advance} and does not depend on $\pi^{\star}$. The \texttt{rings-12}
+Held--Karp optimum is empirically non-contiguous with respect to every
+$D$ tried at $d \leq 3$: any straight-line bisection either separates
+the two rings or cuts each ring into two diametrically opposed
+half-rings, while $\pi^{\star}$ alternates between inner and outer
+rings. Finer angular search adds resolution but does not change the
+decomposition primitive, so it cannot defeat the obstruction.
 
 \subsection{Observations}
 
@@ -554,6 +602,17 @@ None of these are claimed to defeat the decomposition-irrecoverability
 obstruction. SiftTSP is and will remain a heuristic; this work makes
 \textbf{no claim} of resolving $\mathcal{P}$ versus $\mathcal{NP}$.
 
+\section*{Code and Data Availability}
+
+The reference implementation, all instance families, and the
+verification scripts are available at
+\url{https://github.com/McNopper/SiftTSP}. Specifically:
+\texttt{SiftTSP.py} (algorithm), \texttt{tests/adversarial.py} (Table~1
+battery, fixed seeds as above), \texttt{counterexample.py} (Table~2
+\texttt{rings-12} instance with literal coordinates and Held--Karp
+verification). Numbers reported in this paper were produced by these
+scripts under CPython~3.11.
+
 \section*{References}
 
 \begin{thebibliography}{99}\small
@@ -584,6 +643,12 @@ R.~M.~Karp, ``Reducibility among combinatorial problems,''
 in R.~E.~Miller and J.~W.~Thatcher (eds.) \emph{Complexity of Computer
 Computations}, pp.~85--103. Plenum Press, New York (1972).
 \url{https://doi.org/10.1007/978-1-4684-2001-2_9}
+
+\bibitem{papadimitriou1977}
+C.~H.~Papadimitriou, ``The Euclidean travelling salesman problem is
+NP-complete,''
+\emph{Theoretical Computer Science} \textbf{4}(3), 237--244 (1977).
+\url{https://doi.org/10.1016/0304-3975(77)90012-3}
 
 \bibitem{heldkarp1962}
 M.~Held and R.~M.~Karp, ``A dynamic programming approach to
