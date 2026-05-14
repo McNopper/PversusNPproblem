@@ -29,17 +29,13 @@ The full scientific write-up — definitions, pseudocode, complexity proof
 (Theorem 1), experimental battery, counterexample and discussion of
 *decomposition irrecoverability* — is available as a single PDF:
 
-**📄 [`paper/SiftTSP.pdf`](paper/SiftTSP.pdf)**
-
-LaTeX source: [`paper/SiftTSP.tex`](paper/SiftTSP.tex). The original
-markdown sections used to assemble it are kept alongside in
-[`paper/`](paper) for diff-friendly editing.
+**📄 [`SiftTSP.pdf`](SiftTSP.pdf)** — LaTeX source: [`SiftTSP.tex`](SiftTSP.tex).
 
 ## Repository layout
 
 - **[`SiftTSP.py`](SiftTSP.py)** — the algorithm (entry point: `sift_tsp`).
-- **[`paper/`](paper)** — the scientific write-up (PDF, LaTeX, markdown
-  sources).
+- **[`SiftTSP.pdf`](SiftTSP.pdf)** / **[`SiftTSP.tex`](SiftTSP.tex)** —
+  the scientific write-up and its LaTeX source.
 - **[`counterexample.py`](counterexample.py)** — the canonical 12-point
   instance on which the algorithm misses the optimum, with literal
   coordinates and a self-contained verification harness.
@@ -75,7 +71,7 @@ python -m tests.adversarial
 
 For the algorithm's four phases, the 8-state super-cycle, the $O(n^2)$
 complexity proof, and the structural counterexample, see
-[`paper/SiftTSP.pdf`](paper/SiftTSP.pdf).
+[`SiftTSP.pdf`](SiftTSP.pdf).
 
 ## License
 
