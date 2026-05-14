@@ -1,0 +1,615 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{microtype}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue,
+  citecolor=blue,
+  pdftitle={SiftTSP: A Geometric Sandclock-Sift Heuristic for Euclidean TSP}
+}
+
+\newcommand{\bigO}{\mathcal{O}}
+
+\title{SiftTSP: A Geometric Sandclock-Sift Heuristic\\ for Euclidean TSP}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present \textbf{SiftTSP}, a deterministic polynomial-time heuristic for the
+Euclidean Travelling Salesman Problem in the partitioning lineage of
+Karp~[7]. The algorithm partitions the city set by recursive geometric
+bisection into $2^d$ sections, solves small sections by brute force and
+larger ones by a complementary pair of greedy rules (min-max / max-min),
+and reconnects the section paths by exhaustive search over orderings and
+orientations. The angular dimension of the search is covered by two
+complementary sweeps --- a uniform \emph{mill} (breadth) and a damped
+fan-shaped \emph{sieve} (depth) --- coordinated by a \emph{sandclock}
+depth schedule $1 \to d_{\max} \to 1$ and an 8-state Phase~4 loop over
+(section-mode, mill-direction, ordering). The contribution is the
+specific orchestration of these primitives (\S1.5), not a new
+theoretical guarantee.
+
+For any fixed parameters the algorithm runs in $O(n^2)$ time
+(Theorem~1). SiftTSP is \textbf{not exact}: we exhibit an explicit
+12-point Euclidean instance (\texttt{counterexample.py}, \texttt{rings-12})
+on which the algorithm misses the Held--Karp optimum at every tested
+depth, with gap $+3.24\%$ at $d=3$. The structural reason is identified
+as \emph{decomposition irrecoverability} (\S2.3): no fixed family of
+geometric decompositions can recover an optimal tour that interleaves
+cities across components of every decomposition in the family.
+Consequently this work makes \textbf{no claim} of resolving
+$\mathcal{P}$ versus $\mathcal{NP}$~[1, 2, 3], and offers no
+approximation ratio (unlike Christofides~[8] for metric TSP or
+Arora~[11] for Euclidean TSP).
+
+On a battery of 14 instances ($n \in \{12, 14, 16\}$) including zigzag,
+comb, interleaved, concentric-ring, and uniform configurations, SiftTSP
+matches Held--Karp on most structured inputs and beats 2-opt on the
+rotationally symmetric \texttt{rings-12} and \texttt{rings-14} instances
+despite not being exact.
+
+\medskip
+\noindent\textbf{Keywords:} Travelling Salesman Problem, Polynomial-Time
+Heuristic, Euclidean TSP, Geometric Subdivision, Mill-Sieve Search.
+\end{abstract}
+
+\section{Algorithm}
+
+\subsection{Setting}
+
+Given $n$ cities $C = \{c_1, \dots, c_n\} \subset \mathbb{R}^2$, a
+\emph{tour} is a cyclic permutation $\pi$ of $C$, and its length is
+$L(\pi) = \sum_i \Vert c_{\pi(i)} - c_{\pi(i+1)} \Vert_2$ (indices
+$\bmod\ n$). Euclidean TSP asks for an $L$-minimum tour. The decision
+form is NP-Complete~[5]; the optimisation form is NP-Hard. The exact
+Held--Karp DP~[6] runs in $O(n^2 \cdot 2^n)$ time and is feasible only
+for small $n$. SiftTSP is a polynomial-time \emph{heuristic} --- it is
+not exact, see \S2.3.
+
+\subsection{Parameters and Phases}
+
+SiftTSP is controlled by four constants treated as fixed:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Symbol & Meaning \\
+\midrule
+$d_{\text{ceiling}}$ & Maximum recursive subdivision depth \\
+$m_{\text{ceiling}}$ & Mill (breadth) cap: third-steps per direction \\
+$s_{\text{ceiling}}$ & Sieve (depth) cap: damped halvings around mill best \\
+$\tau$ & Brute-force threshold: sections with $\leq \tau$ cities are solved exactly \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The algorithm is structured in four phases:
+
+\begin{itemize}
+\item \textbf{Phase~1 (max).} A worst-case greedy-longest tour, computed
+once, fixes an initial upper bound $B_0 \geq L^{\star}$ that the rest only
+lowers.
+
+\item \textbf{Phase~2 (sift).} At each depth $d$ on the sandclock
+schedule $1, 2, \dots, d_{\max}, \dots, 2, 1$ and at each angle $\theta$
+in the current mill+sieve schedule, the city set is partitioned by
+recursive median bisection along \textbf{each} of four axis-pairs (each
+pair: two perpendicular axes from the rotated frame at angle $\theta$
+--- the primary axis governs the top-level split, the secondary axis the
+next level, alternating thereafter). The four pairs are taken from
+$\{\text{vertical},\ /,\ \text{horizontal},\ \backslash\}$. Each
+axis-pair yields a partition into $2^d$ sections, evaluated
+independently. Sections of size $> \tau$ are solved by a greedy section
+solver in one of two complementary modes (selected per sweep by
+Phase~4):
+\begin{itemize}
+\item \textbf{min-max}: at each step, append the city minimising the
+running \emph{maximum} edge (favouring smooth paths);
+\item \textbf{max-min}: at each step, append the city maximising the
+running \emph{minimum} edge (a complementary ordering).
+\end{itemize}
+
+\item \textbf{Phase~3 (min).} Sections of size $\leq \tau$ are solved
+exactly by brute force. The $2^d$ section paths are reconnected by
+exhaustive search over $(2^d - 1)! \cdot 2^{2^d - 1}$ orderings and
+orientations.
+
+\item \textbf{Phase~4 (loop).} An 8-state super-cycle drives the angular
+search.
+\end{itemize}
+
+The angular dimension uses two complementary sweeps. The \textbf{mill}
+is a uniform third-step rotation across $[0, \pi/2)$ in both directions
+(breadth). The \textbf{sieve} is a damped forth-and-back oscillation
+around the best $(\theta^{\star}, d^{\star})$ found by the mill, with
+amplitudes $\tfrac{s_0}{2}, \tfrac{s_0}{4}, \dots, \tfrac{s_0}{2^{s}}$
+where $s_0 = (\pi / 2^{d^{\star}}) / 3$ (depth). Mill and sieve refine
+the \emph{same} angular axis at different scales; together they sift
+the search through both wide and narrow neighbourhoods of every depth.
+
+\subsection{The Phase~4 Super-Cycle}
+
+Each sandclock sweep is parameterised by a tuple
+$(d_{\max}, m, s, \mu, \delta)$, where $\mu$ is the section-solver mode
+(min-max / max-min) and $\delta$ is the angular-sweep direction
+(CW / CCW). The four configurations $(\mu, \delta)$ may be visited in
+two orderings --- \emph{mode-first} (MD) or \emph{direction-first} (DM)
+--- giving an 8-state super-cycle:
+
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$k$ & $\mu$ & $\delta$ & ordering \\
+\midrule
+0 & max-min & CW  & MD \\
+1 & min-max & CW  & MD \\
+2 & max-min & CCW & MD \\
+3 & min-max & CCW & MD \\
+4 & max-min & CW  & DM \\
+5 & max-min & CCW & DM \\
+6 & min-max & CW  & DM \\
+7 & min-max & CCW & DM \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The order of visitation matters because the mill cap $m$ and sieve cap
+$s$ double \emph{only on improvement}; the sequence of $(\text{config},
+m, s)$ triples ever evaluated depends on the order.
+
+\paragraph{Transition rule.} After a sweep at position $k$:
+\begin{enumerate}
+\item If the \emph{mill} improved the running best, $m \leftarrow 2m$.
+\item If the \emph{sieve} improved the running best, $s \leftarrow 2s$.
+\item Advance $k \leftarrow (k+1) \bmod 8$.
+\item If 8 consecutive sweeps at the same $(d_{\max}, m, s)$ all fail,
+bump $d_{\max} \leftarrow d_{\max} + 1$, reset $m, s, k$ to $1, 1, 0$,
+and restart Phase~2.
+\end{enumerate}
+
+The loop terminates when $d_{\max}$ reaches $d_{\text{ceiling}}$ and the
+super-cycle converges. Tour length is bounded below by OPT and is
+monotone non-increasing across the loop, so termination is guaranteed.
+
+\subsection{Pseudocode}
+
+\begin{small}
+\begin{verbatim}
+SUPERCYCLE := concat(
+    [(MaxMin,CW), (MinMax,CW), (MaxMin,CCW), (MinMax,CCW)],   # ordering MD
+    [(MaxMin,CW), (MaxMin,CCW), (MinMax,CW), (MinMax,CCW)]    # ordering DM
+)                                                              # length 8
+
+procedure SiftTSP(C, d_ceiling, m_ceiling, s_ceiling, tau):
+    best <- WorstCaseTour(C); best_len <- Length(best)         # PHASE 1
+    for d_max = 1 .. d_ceiling do                              # PHASE 4
+        m, s, k, no_improve <- 1, 1, 0, 0
+        while m <= m_ceiling or s <= s_ceiling do
+            (mode, dir) <- SUPERCYCLE[k]
+            (best, best_len, mill_imp, sieve_imp)
+              <- SandclockSweep(C, d_max, min(m,m_ceiling),
+                                min(s,s_ceiling), tau, mode, dir,
+                                best, best_len)
+            k <- (k+1) mod 8
+            if mill_imp or sieve_imp then
+                no_improve <- 0
+                if mill_imp  and m <= m_ceiling then m <- 2*m
+                if sieve_imp and s <= s_ceiling then s <- 2*s
+            else
+                no_improve <- no_improve + 1
+                if no_improve >= 8 then break
+    return best
+
+procedure SandclockSweep(C, d_max, m, s, tau, mode, dir, best, best_len):
+    mill_imp, sieve_imp, theta*, d* <- false, false, 0, d_max
+    for d in [1,2,..,d_max,..,2,1] do                          # PHASE 2 mill
+        for theta in MillAngles(d, m, dir) do
+            (best, best_len, hit) <- EvalAt(C, d, theta, tau, mode, ...)
+            if hit then mill_imp, theta*, d* <- true, theta, d
+    s0 <- (pi / 2^d*) / 3                                      # PHASE 2 sieve
+    for j = 0 .. s-1 do
+        delta <- s0 / 2^(j+1)
+        for sigma in (+1, -1) do
+            (best, best_len, hit) <- EvalAt(C, d*, theta* + sigma*delta, ...)
+            if hit then sieve_imp, theta* <- true, theta* + sigma*delta
+    return (best, best_len, mill_imp, sieve_imp)
+
+procedure EvalAt(C, d, theta, tau, mode, best, best_len):
+    hit <- false
+    for (axis_p, axis_s) in AxisPairs(theta) do                # 4 pairs
+        sections <- Subdivide(C, [axis_p, axis_s], d)
+        paths <- []
+        for S in sections do
+            if |S| <= tau then paths <- paths + [BruteForce(S)]      # PHASE 3
+            elif mode = MinMax then paths <- paths + [MinMax(S)]     # PHASE 2
+            else                    paths <- paths + [MaxMin(S)]
+        T <- BruteForceConnect(paths)
+        if Length(T) < best_len then
+            best_len, best, hit <- Length(T), T, true
+    return (best, best_len, hit)
+\end{verbatim}
+\end{small}
+
+The reference implementation is \texttt{SiftTSP.py}; entry point
+\texttt{sift\_tsp}.
+
+\subsection{Prior Art and Contribution}
+
+SiftTSP belongs to the family of \textbf{geometric-partitioning
+heuristics} for Euclidean TSP, whose canonical antecedent is Karp's
+1977 probabilistic analysis of partitioning algorithms~[7]. In that
+scheme the plane is divided into rectangles, each sub-instance is
+solved (optimally or heuristically), and the sub-tours are reconnected.
+Later geometric heuristics, surveyed by Bentley~[12], explore strip,
+space-filling-curve, and recursive variants. Arora's PTAS~[11] is the
+theoretical apex of geometric methods, achieving a $(1+\varepsilon)$
+approximation in polynomial time but with constants that make it
+impractical at small $n$. State-of-the-art \emph{practical} solvers ---
+LKH~[10], built on Lin--Kernighan~[9], and Concorde~[4] --- are not
+partitioning-based and dominate empirically on TSPLIB-scale instances.
+
+Against this backdrop, \textbf{SiftTSP makes no theoretical claim that
+extends prior art.} Its complexity bound ($O(n^2)$) is no better than
+several classical heuristics; it offers no approximation ratio (unlike
+Christofides~[8] for metric TSP or Arora~[11] for Euclidean TSP); and
+it is empirically not exact (\S2.3). What it offers is an
+\emph{engineering recipe} combining:
+
+\begin{enumerate}
+\item a \textbf{sandclock depth schedule} $1 \to d_{\max} \to 1$ that
+visits every depth twice per sweep, once on the way up and once on the
+way down;
+\item a \textbf{two-scale angular search} pairing a uniform ``mill''
+(breadth) with a damped ``sieve'' (depth) around the mill's best
+angle;
+\item an \textbf{8-state Phase~4 super-cycle} that systematically
+permutes section-solver mode (min-max / max-min), angular sweep
+direction (CW / CCW), and visit ordering (MD / DM), with independent
+doubling caps on mill and sieve that grow only on improvement.
+\end{enumerate}
+
+To the authors' knowledge this specific orchestration is new, but each
+individual primitive (recursive median bisection, exhaustive sub-tour
+chaining, greedy section solvers, rotational axis search) is standard.
+We therefore frame SiftTSP as a \textbf{deterministic, reproducible,
+and falsifiable} partitioning heuristic --- and ship a concrete witness
+to its non-exactness (\S2.3) rather than leave exactness as an open
+question.
+
+\subsection{Complexity}
+
+Treat $d_{\text{ceiling}}, m_{\text{ceiling}}, s_{\text{ceiling}}, \tau$
+as fixed constants independent of $n$.
+
+\paragraph{Lemma 1 (Subdivide).} \textit{Algorithm \texttt{Subdivide}
+runs in $O(n \log n)$ time and produces at most $2^d$ sections of size
+$\lceil n/2^d \rceil$ or $\lfloor n/2^d \rfloor$.}
+
+\textit{Proof.} The recursion has depth $d$. At each level the cities
+in each sub-list are sorted once along the current axis and split at
+the median, so each level does $O(n \log n)$ comparison work in total.
+With $d$ fixed, total work is $O(n \log n)$. Median splits keep section
+sizes balanced. $\square$
+
+\paragraph{Lemma 2 (Section solving).} \textit{With $k = 2^d$ and
+balanced bisection (Lemma~1), processing all sections takes $O(1)$ time
+when every section has $\leq \tau$ cities (that is, when
+$\lceil n/k \rceil \leq \tau$), and $O(n^2 / k)$ time otherwise; the
+mixed regime is bounded by the larger.}
+
+\textit{Proof.} Brute force on a section of $\leq \tau$ cities is
+$O(\tau!) = O(1)$, and there are at most $k = O(1)$ such sections,
+giving $O(1)$ total. For the greedy branch, each section has size
+$s_i \leq \lceil n/k \rceil$ by balanced bisection, and the $O(s_i^2)$
+greedy solver gives total cost $\sum_i s_i^2 \leq k \cdot (n/k)^2 = n^2/k$.
+$\square$
+
+\paragraph{Lemma 3 (Connection).} \textit{For fixed $d$ (hence fixed
+$k = 2^d$), \texttt{BruteForceConnect} runs in $O(n)$ time.}
+
+\textit{Proof.} There are $(k-1)!$ orderings and $2^{k-1}$ flip vectors
+(both $O(1)$ for fixed $d$), and each candidate tour is scored in
+$O(n)$. $\square$
+
+\paragraph{Lemma 4 (Phase~1).} \textit{The greedy-longest construction
+in the reference implementation runs in $O(n^2)$ time.}
+
+\textit{Proof.} At each of $n$ steps it scans the remaining unvisited
+cities to find the farthest from the current endpoint and removes it
+from a list, both $O(n)$ operations. $\square$
+
+\paragraph{Theorem 1 (Time complexity of SiftTSP).} \textit{For fixed
+parameters, SiftTSP runs in $O(n^2)$ time on every input.}
+
+\textit{Proof.} Phase~1 costs $O(n^2)$ (Lemma~4). Each \texttt{EvalAt}
+invocation loops over the four axis-pairs (\S1.4), each costing
+$O(n \log n)$ for \texttt{Subdivide} (Lemma~1), $O(n^2/k)$ for section
+solving (Lemma~2; $O(1)$ in the bounded-$n$ all-exact regime), and
+$O(n)$ for \texttt{BruteForceConnect} (Lemma~3); together $O(n^2)$ per
+\texttt{EvalAt}. Because $d_{\max} \leq d_{\text{ceiling}}$ throughout
+the run, the number of \texttt{EvalAt} invocations per
+\texttt{SandclockSweep} is
+$O(d_{\text{ceiling}} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) = O(1)$.
+The total number of sweeps in Phase~4 is bounded by
+$d_{\text{ceiling}} \cdot 8 \cdot (\log m_{\text{ceiling}} + \log s_{\text{ceiling}} + 1) = O(1)$,
+because both ceilings double on improvement and at most 8 consecutive
+non-improving sweeps occur at any rung. Multiplying gives $O(n^2)$.
+$\square$
+
+\paragraph{Corollary 1.} \textit{SiftTSP is a polynomial-time algorithm
+for all fixed parameters.} Polynomiality is a property of a
+\emph{heuristic}: \S2.3 shows it is not exact in general.
+
+\paragraph{Remark (sharper bounds in sub-regimes).} Phase~1 dominates
+the worst-case bound. If Phase~1 were replaced by an $O(n \log n)$
+implementation (for example via a $k$-d tree for farthest-point
+queries), and if $n$ is small enough that every section is brute-forced
+($\lceil n / 2^{d_{\text{ceiling}}} \rceil \leq \tau$), the overall
+complexity would drop to $O(n \log n)$. With fixed parameters that
+regime is reached only for $n \leq \tau \cdot 2^{d_{\text{ceiling}}}$,
+that is, $n$ bounded by a constant, in which case the entire algorithm
+is trivially $O(1)$. We therefore report the honest worst-case bound
+$O(n^2)$.
+
+\section{Experiments}
+
+\subsection{Setup}
+
+All experiments use the Euclidean distance metric. Optimal tours are
+computed by the exact Held--Karp DP~[6] (feasible up to $n \approx 20$).
+We compare SiftTSP (\texttt{SiftTSP.py}, entry point \texttt{sift\_tsp})
+against:
+
+\begin{itemize}
+\item \textbf{Held--Karp}: exact $O(n^2 \cdot 2^n)$ DP --- ground-truth
+optimum.
+\item \textbf{Nearest-Neighbor (NN)}: classic $O(n^2)$ greedy
+construction.
+\item \textbf{2-opt}: 2-opt local search starting from the NN tour.
+\end{itemize}
+
+SiftTSP is run with $\tau = 6$ and $d_{\max} \in \{1, 2, 3\}$. The
+optimality gap is $(L / L^{\star} - 1) \times 100\%$ where $L^{\star}$ is
+the Held--Karp optimum.
+
+Reproduce with:
+\begin{small}
+\begin{verbatim}
+$env:PYTHONIOENCODING="utf-8"; python -m tests.adversarial   # full battery
+$env:PYTHONIOENCODING="utf-8"; python counterexample.py      # canonical counterexample
+\end{verbatim}
+\end{small}
+
+\subsection{Adversarial Battery}
+
+Instance families designed to probe geometric-bisection weaknesses:
+
+\begin{itemize}
+\item \textbf{zigzag}-\textit{n}: $n$ points alternating across a
+vertical axis.
+\item \textbf{interleaved}-\textit{n}: two clusters with interleaved
+indices.
+\item \textbf{comb}-\textit{n}: a spine with vertical teeth.
+\item \textbf{rings}-\textit{n}: two concentric rings --- no axis is
+preferred.
+\item \textbf{uniform}-\textit{n}: uniform random control.
+\end{itemize}
+
+\paragraph{Table 1.} Optimality gap (\%) --- \textbf{bold = exact},
+\textit{italic = sub-optimal}.
+
+\begin{center}
+\begin{tabular}{lcccccc}
+\toprule
+Instance & $n$ & NN & NN+2-opt & $d{=}1$ & $d{=}2$ & $d{=}3$ \\
+\midrule
+zigzag-12        & 12 & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+zigzag-14        & 14 & 28.84         & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+zigzag-16        & 16 & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+zigzag-tight-12  & 12 & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+zigzag-wide-14   & 14 & 19.52         & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+interleaved-12   & 12 & 38.09         & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+interleaved-14   & 14 & \textbf{0.00} & \textbf{0.00} & \textit{31.41} & \textbf{0.00} & \textbf{0.00} \\
+comb-12          & 12 & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+comb-14          & 14 & \textbf{0.00} & \textbf{0.00} & \textit{25.98} & \textbf{0.00} & \textbf{0.00} \\
+\textbf{rings-12} & 12 & 17.63 & 17.63 & \textit{6.61} & \textit{6.61} & \textit{3.24} \\
+\textbf{rings-14} & 14 & 8.58  & 8.58  & \textit{26.06} & \textit{3.82} & \textit{1.52} \\
+uniform-12       & 12 & 12.20 & \textbf{0.00} & \textbf{0.00} & \textit{5.46} & \textbf{0.00} \\
+uniform-14       & 14 & 30.36 & \textbf{0.00} & \textit{15.32} & \textit{1.47} & \textit{1.47} \\
+uniform-16       & 16 & 12.01 & 1.01          & \textit{9.78}  & \textit{7.60} & \textit{0.31} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Counterexample to Exactness --- \texttt{rings-12}}
+
+We exhibit an explicit 12-point Euclidean instance on which SiftTSP
+fails to recover the optimum at every tested depth. The instance, an
+inner ring of 6 points of radius $\approx 2$ and an outer ring of 6
+points of radius $\approx 4$ both centred at $(5,5)$, is materialised
+verbatim in \texttt{counterexample.py}.
+
+\paragraph{Table 2.} Counterexample \texttt{rings-12} --- Held--Karp
+optimum $L^{\star} = 29.7823$.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Algorithm & Length $L$ & Gap \\
+\midrule
+Held--Karp (exact)            & 29.7823 & --- \\
+SiftTSP, $d=1$, $\tau=6$      & 31.7503 & $+6.61\%$ \\
+SiftTSP, $d=2$, $\tau=6$      & 31.7503 & $+6.61\%$ \\
+SiftTSP, $d=3$, $\tau=6$      & 30.7478 & $+3.24\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Proposition 1 (Non-exactness).} \textit{SiftTSP with
+$\tau = 6$ and any $d \in \{1, 2, 3\}$ is not exact on the Euclidean
+TSP.}
+
+\textit{Proof.} The 12-point instance \texttt{RINGS\_12} in
+\texttt{counterexample.py} is a witness: Held--Karp's optimum has
+length $29.7823$, while SiftTSP at $d=1,2$ returns $31.7503$ and at
+$d=3$ returns $30.7478$, all strictly greater. Values are reproducible
+by \texttt{python counterexample.py}. $\square$
+
+The following is the structural intuition for \emph{why} \texttt{rings-12}
+defeats the algorithm; it is an argument, not a formal proof of
+non-exactness (Proposition~1 above does that).
+
+\paragraph{Argument (Decomposition irrecoverability).}
+\textit{Fix a finite family $\mathcal{D}$ of geometric decompositions
+of a point set $C$, each partitioning $C$ into components, and consider
+any algorithm that, for each $D \in \mathcal{D}$, solves every
+component optimally as an open path and then optimally chains those
+paths into a closed tour, finally returning the shortest tour across
+all $D \in \mathcal{D}$. If the global optimum $\pi^{\star}$ is not
+``component-contiguous'' for any $D \in \mathcal{D}$ --- that is, for
+every $D$, some component of $D$ is entered and left more than once by
+$\pi^{\star}$ --- then no chaining can recover $\pi^{\star}$, and the
+algorithm's output is strictly longer than $L(\pi^{\star})$.}
+
+This applies to SiftTSP because the family $\mathcal{D}$ it explores
+(median bisections at depths $1, \dots, d_{\max}$ along finitely many
+rotated axes and four axis-pairs) is \emph{fixed} and does not depend
+on $\pi^{\star}$. The \texttt{rings-12} Held--Karp optimum is empirically
+non-contiguous with respect to every $D$ tried at $d \leq 3$ (any
+straight-line bisection separates the two rings or cuts them in two
+diametrically opposed half-rings, while the optimum alternates between
+inner and outer rings). Finer angular search adds resolution but does
+not change the decomposition primitive, so it cannot defeat the
+obstruction.
+
+\subsection{Observations}
+
+The following are observations from the 14-instance battery (Table~1).
+Each instance is run on a single fixed seed; we report descriptive
+findings, not statistical claims.
+
+\begin{enumerate}
+\item \textbf{Structured inputs are matched.} On zigzag, comb, and
+interleaved instances ($n \in \{12, 14, 16\}$), SiftTSP at $d \geq 2$
+matches Held--Karp in every tested case, including instances where NN
+has gaps up to $+38\%$.
+\item \textbf{Two rotationally symmetric inputs are not matched, but
+2-opt is beaten on both.} On \texttt{rings-12} and \texttt{rings-14},
+NN and 2-opt are stuck at $+17.63\%$ and $+8.58\%$; SiftTSP at $d=3$
+achieves $+3.24\%$ and $+1.52\%$. Sample size is two; we do not claim
+this pattern holds on a wider population of rotationally symmetric
+instances.
+\item \textbf{Increasing depth is not monotone.} On \texttt{uniform-12},
+$d{=}2$ gives $+5.46\%$ while $d \in \{1, 3\}$ are exact. Finer
+subdivision can split clusters that the optimum traverses contiguously.
+\end{enumerate}
+
+\subsection{Discussion}
+
+\paragraph{Where SiftTSP appears useful (on this battery).} Determinism
+(reproducible given $(C, d, \tau, m, s)$); strong performance on inputs
+with a clear geometric scan order (zigzag/comb/interleaved); and a
+suggestive regime on the two rotationally symmetric instances tested,
+where 2-opt is trapped. A larger study would be needed to claim this
+generalises.
+
+\paragraph{Limits.} Decomposition irrecoverability (\S2.3) is the
+structural ceiling of \emph{any} algorithm that explores only a
+fixed-in-advance family of geometric decompositions and then optimally
+chains the resulting component paths. The \texttt{rings-12} $+3.24\%$
+wall is unmoved by the mill+sieve refinement, consistent with the
+obstruction being structural rather than angular-resolution-limited.
+The connection step's $(2^d - 1)! \cdot 2^{2^d - 1}$ growth blocks
+$d \geq 4$ unless replaced by a smarter chaining primitive.
+
+\paragraph{Open directions.}
+\begin{itemize}
+\item \emph{Adaptive decomposition} (axes that depend on local
+geometry).
+\item \emph{Recursive connection} (replace the brute-force chain by a
+recursive SiftTSP application on the path endpoints).
+\item \emph{Hybridisation} with 2-opt or Lin--Kernighan~[9]
+(LKH~[10]) using SiftTSP as an initial-tour generator.
+\item \emph{Characterisation of exactness regimes} --- a sufficient
+geometric condition on $C$ guaranteeing exactness would clarify the
+value of the algorithm as a conditional exact solver.
+\end{itemize}
+
+None of these are claimed to defeat the decomposition-irrecoverability
+obstruction. SiftTSP is and will remain a heuristic; this work makes
+\textbf{no claim} of resolving $\mathcal{P}$ versus $\mathcal{NP}$.
+
+\section*{References}
+
+\begin{small}
+\begin{enumerate}[leftmargin=*,label={[\arabic*]}]
+\item Cook, S.A.: The complexity of theorem-proving procedures. In:
+Proceedings of the 3rd Annual ACM Symposium on Theory of Computing
+(STOC), pp.~151--158. ACM, New York (1971).
+\url{https://doi.org/10.1145/800157.805047}
+
+\item Levin, L.A.: Universal sequential search problems. Problems of
+Information Transmission 9(3), 265--266 (1973).
+
+\item Aaronson, S.: P vs.\ NP. In: Downey, R. (ed.) Fundamentals of
+Computation Theory. Springer, Berlin (2009).
+\url{https://www.scottaaronson.com/papers/pnp.pdf}
+
+\item Applegate, D.L., Bixby, R.E., Chv\'atal, V., Cook, W.J.: The
+Traveling Salesman Problem: A Computational Study. Princeton University
+Press, Princeton (2006).
+
+\item Karp, R.M.: Reducibility among combinatorial problems. In:
+Miller, R.E., Thatcher, J.W. (eds.) Complexity of Computer
+Computations, pp.~85--103. Plenum Press, New York (1972).
+\url{https://doi.org/10.1007/978-1-4684-2001-2_9}
+
+\item Held, M., Karp, R.M.: A dynamic programming approach to
+sequencing problems. Journal of the Society for Industrial and Applied
+Mathematics 10(1), 196--210 (1962).
+\url{https://doi.org/10.1137/0110015}
+
+\item Karp, R.M.: Probabilistic analysis of partitioning algorithms
+for the traveling-salesman problem in the plane. Mathematics of
+Operations Research 2(3), 209--224 (1977).
+\url{https://doi.org/10.1287/moor.2.3.209}
+
+\item Christofides, N.: Worst-case analysis of a new heuristic for the
+travelling salesman problem. Report 388, Graduate School of Industrial
+Administration, Carnegie Mellon University (1976).
+
+\item Lin, S., Kernighan, B.W.: An effective heuristic algorithm for
+the traveling-salesman problem. Operations Research 21(2), 498--516
+(1973). \url{https://doi.org/10.1287/opre.21.2.498}
+
+\item Helsgaun, K.: An effective implementation of the Lin--Kernighan
+traveling salesman heuristic. European Journal of Operational Research
+126(1), 106--130 (2000).
+\url{https://doi.org/10.1016/S0377-2217(99)00284-2}
+
+\item Arora, S.: Polynomial time approximation schemes for Euclidean
+traveling salesman and other geometric problems. Journal of the ACM
+45(5), 753--782 (1998). \url{https://doi.org/10.1145/290179.290180}
+
+\item Bentley, J.L.: Fast algorithms for geometric traveling salesman
+problems. ORSA Journal on Computing 4(4), 387--411 (1992).
+\url{https://doi.org/10.1287/ijoc.4.4.387}
+\end{enumerate}
+\end{small}
+
+\end{document}
