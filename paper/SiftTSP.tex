@@ -32,7 +32,7 @@
 \begin{abstract}
 We present \textbf{SiftTSP}, a deterministic polynomial-time heuristic for the
 Euclidean Travelling Salesman Problem in the partitioning lineage of
-Karp~[7]. The algorithm partitions the city set by recursive geometric
+Karp~\cite{karp1977}. The algorithm partitions the city set by recursive geometric
 bisection into $2^d$ sections, solves small sections by brute force and
 larger ones by a complementary pair of greedy rules (min-max / max-min),
 and reconnects the section paths by exhaustive search over orderings and
@@ -53,9 +53,9 @@ as \emph{decomposition irrecoverability} (\S2.3): no fixed family of
 geometric decompositions can recover an optimal tour that interleaves
 cities across components of every decomposition in the family.
 Consequently this work makes \textbf{no claim} of resolving
-$\mathcal{P}$ versus $\mathcal{NP}$~[1, 2, 3], and offers no
-approximation ratio (unlike Christofides~[8] for metric TSP or
-Arora~[11] for Euclidean TSP).
+$\mathcal{P}$ versus $\mathcal{NP}$~\cite{cook1971,levin1973,aaronson2009}, and offers no
+approximation ratio (unlike Christofides~\cite{christofides1976} for metric TSP or
+Arora~\cite{arora1998} for Euclidean TSP).
 
 On a battery of 14 instances ($n \in \{12, 14, 16\}$) including zigzag,
 comb, interleaved, concentric-ring, and uniform configurations, SiftTSP
@@ -76,8 +76,8 @@ Given $n$ cities $C = \{c_1, \dots, c_n\} \subset \mathbb{R}^2$, a
 \emph{tour} is a cyclic permutation $\pi$ of $C$, and its length is
 $L(\pi) = \sum_i \Vert c_{\pi(i)} - c_{\pi(i+1)} \Vert_2$ (indices
 $\bmod\ n$). Euclidean TSP asks for an $L$-minimum tour. The decision
-form is NP-Complete~[5]; the optimisation form is NP-Hard. The exact
-Held--Karp DP~[6] runs in $O(n^2 \cdot 2^n)$ time and is feasible only
+form is NP-Complete~\cite{karp1972}; the optimisation form is NP-Hard. The exact
+Held--Karp DP~\cite{heldkarp1962} runs in $O(n^2 \cdot 2^n)$ time and is feasible only
 for small $n$. SiftTSP is a polynomial-time \emph{heuristic} --- it is
 not exact, see \S2.3.
 
@@ -252,21 +252,21 @@ The reference implementation is \texttt{SiftTSP.py}; entry point
 
 SiftTSP belongs to the family of \textbf{geometric-partitioning
 heuristics} for Euclidean TSP, whose canonical antecedent is Karp's
-1977 probabilistic analysis of partitioning algorithms~[7]. In that
+1977 probabilistic analysis of partitioning algorithms~\cite{karp1977}. In that
 scheme the plane is divided into rectangles, each sub-instance is
 solved (optimally or heuristically), and the sub-tours are reconnected.
-Later geometric heuristics, surveyed by Bentley~[12], explore strip,
-space-filling-curve, and recursive variants. Arora's PTAS~[11] is the
+Later geometric heuristics, surveyed by Bentley~\cite{bentley1992}, explore strip,
+space-filling-curve, and recursive variants. Arora's PTAS~\cite{arora1998} is the
 theoretical apex of geometric methods, achieving a $(1+\varepsilon)$
 approximation in polynomial time but with constants that make it
 impractical at small $n$. State-of-the-art \emph{practical} solvers ---
-LKH~[10], built on Lin--Kernighan~[9], and Concorde~[4] --- are not
+LKH~\cite{helsgaun2000}, built on Lin--Kernighan~\cite{linkernighan1973}, and Concorde~\cite{applegate2006} --- are not
 partitioning-based and dominate empirically on TSPLIB-scale instances.
 
 Against this backdrop, \textbf{SiftTSP makes no theoretical claim that
 extends prior art.} Its complexity bound ($O(n^2)$) is no better than
 several classical heuristics; it offers no approximation ratio (unlike
-Christofides~[8] for metric TSP or Arora~[11] for Euclidean TSP); and
+Christofides~\cite{christofides1976} for metric TSP or Arora~\cite{arora1998} for Euclidean TSP); and
 it is empirically not exact (\S2.3). What it offers is an
 \emph{engineering recipe} combining:
 
@@ -371,7 +371,7 @@ $O(n^2)$.
 \subsection{Setup}
 
 All experiments use the Euclidean distance metric. Optimal tours are
-computed by the exact Held--Karp DP~[6] (feasible up to $n \approx 20$).
+computed by the exact Held--Karp DP~\cite{heldkarp1962} (feasible up to $n \approx 20$).
 We compare SiftTSP (\texttt{SiftTSP.py}, entry point \texttt{sift\_tsp})
 against:
 
@@ -543,8 +543,8 @@ $d \geq 4$ unless replaced by a smarter chaining primitive.
 geometry).
 \item \emph{Recursive connection} (replace the brute-force chain by a
 recursive SiftTSP application on the path endpoints).
-\item \emph{Hybridisation} with 2-opt or Lin--Kernighan~[9]
-(LKH~[10]) using SiftTSP as an initial-tour generator.
+\item \emph{Hybridisation} with 2-opt or Lin--Kernighan~\cite{linkernighan1973}
+(LKH~\cite{helsgaun2000}) using SiftTSP as an initial-tour generator.
 \item \emph{Characterisation of exactness regimes} --- a sufficient
 geometric condition on $C$ guaranteeing exactness would clarify the
 value of the algorithm as a conditional exact solver.
@@ -556,60 +556,79 @@ obstruction. SiftTSP is and will remain a heuristic; this work makes
 
 \section*{References}
 
-\begin{small}
-\begin{enumerate}[leftmargin=*,label={[\arabic*]}]
-\item Cook, S.A.: The complexity of theorem-proving procedures. In:
-Proceedings of the 3rd Annual ACM Symposium on Theory of Computing
-(STOC), pp.~151--158. ACM, New York (1971).
+\begin{thebibliography}{99}\small
+
+\bibitem{cook1971}
+S.~A.~Cook, ``The complexity of theorem-proving procedures,''
+in \emph{Proceedings of the 3rd Annual ACM Symposium on Theory of
+Computing (STOC)}, pp.~151--158. ACM, New York (1971).
 \url{https://doi.org/10.1145/800157.805047}
 
-\item Levin, L.A.: Universal sequential search problems. Problems of
-Information Transmission 9(3), 265--266 (1973).
+\bibitem{levin1973}
+L.~A.~Levin, ``Universal sequential search problems,''
+\emph{Problems of Information Transmission} \textbf{9}(3), 265--266 (1973).
 
-\item Aaronson, S.: P vs.\ NP. In: Downey, R. (ed.) Fundamentals of
-Computation Theory. Springer, Berlin (2009).
+\bibitem{aaronson2009}
+S.~Aaronson, ``P vs.\ NP,''
+in R.~Downey (ed.) \emph{Fundamentals of Computation Theory}.
+Springer, Berlin (2009).
 \url{https://www.scottaaronson.com/papers/pnp.pdf}
 
-\item Applegate, D.L., Bixby, R.E., Chv\'atal, V., Cook, W.J.: The
-Traveling Salesman Problem: A Computational Study. Princeton University
-Press, Princeton (2006).
+\bibitem{applegate2006}
+D.~L.~Applegate, R.~E.~Bixby, V.~Chv\'atal, and W.~J.~Cook,
+\emph{The Traveling Salesman Problem: A Computational Study}.
+Princeton University Press, Princeton (2006).
 
-\item Karp, R.M.: Reducibility among combinatorial problems. In:
-Miller, R.E., Thatcher, J.W. (eds.) Complexity of Computer
-Computations, pp.~85--103. Plenum Press, New York (1972).
+\bibitem{karp1972}
+R.~M.~Karp, ``Reducibility among combinatorial problems,''
+in R.~E.~Miller and J.~W.~Thatcher (eds.) \emph{Complexity of Computer
+Computations}, pp.~85--103. Plenum Press, New York (1972).
 \url{https://doi.org/10.1007/978-1-4684-2001-2_9}
 
-\item Held, M., Karp, R.M.: A dynamic programming approach to
-sequencing problems. Journal of the Society for Industrial and Applied
-Mathematics 10(1), 196--210 (1962).
+\bibitem{heldkarp1962}
+M.~Held and R.~M.~Karp, ``A dynamic programming approach to
+sequencing problems,''
+\emph{Journal of the Society for Industrial and Applied Mathematics}
+\textbf{10}(1), 196--210 (1962).
 \url{https://doi.org/10.1137/0110015}
 
-\item Karp, R.M.: Probabilistic analysis of partitioning algorithms
-for the traveling-salesman problem in the plane. Mathematics of
-Operations Research 2(3), 209--224 (1977).
+\bibitem{karp1977}
+R.~M.~Karp, ``Probabilistic analysis of partitioning algorithms for
+the traveling-salesman problem in the plane,''
+\emph{Mathematics of Operations Research} \textbf{2}(3), 209--224 (1977).
 \url{https://doi.org/10.1287/moor.2.3.209}
 
-\item Christofides, N.: Worst-case analysis of a new heuristic for the
-travelling salesman problem. Report 388, Graduate School of Industrial
-Administration, Carnegie Mellon University (1976).
+\bibitem{christofides1976}
+N.~Christofides, ``Worst-case analysis of a new heuristic for the
+travelling salesman problem,''
+Report 388, Graduate School of Industrial Administration,
+Carnegie Mellon University (1976).
 
-\item Lin, S., Kernighan, B.W.: An effective heuristic algorithm for
-the traveling-salesman problem. Operations Research 21(2), 498--516
-(1973). \url{https://doi.org/10.1287/opre.21.2.498}
+\bibitem{linkernighan1973}
+S.~Lin and B.~W.~Kernighan, ``An effective heuristic algorithm for
+the traveling-salesman problem,''
+\emph{Operations Research} \textbf{21}(2), 498--516 (1973).
+\url{https://doi.org/10.1287/opre.21.2.498}
 
-\item Helsgaun, K.: An effective implementation of the Lin--Kernighan
-traveling salesman heuristic. European Journal of Operational Research
-126(1), 106--130 (2000).
+\bibitem{helsgaun2000}
+K.~Helsgaun, ``An effective implementation of the Lin--Kernighan
+traveling salesman heuristic,''
+\emph{European Journal of Operational Research} \textbf{126}(1),
+106--130 (2000).
 \url{https://doi.org/10.1016/S0377-2217(99)00284-2}
 
-\item Arora, S.: Polynomial time approximation schemes for Euclidean
-traveling salesman and other geometric problems. Journal of the ACM
-45(5), 753--782 (1998). \url{https://doi.org/10.1145/290179.290180}
+\bibitem{arora1998}
+S.~Arora, ``Polynomial time approximation schemes for Euclidean
+traveling salesman and other geometric problems,''
+\emph{Journal of the ACM} \textbf{45}(5), 753--782 (1998).
+\url{https://doi.org/10.1145/290179.290180}
 
-\item Bentley, J.L.: Fast algorithms for geometric traveling salesman
-problems. ORSA Journal on Computing 4(4), 387--411 (1992).
+\bibitem{bentley1992}
+J.~L.~Bentley, ``Fast algorithms for geometric traveling salesman
+problems,''
+\emph{ORSA Journal on Computing} \textbf{4}(4), 387--411 (1992).
 \url{https://doi.org/10.1287/ijoc.4.4.387}
-\end{enumerate}
-\end{small}
+
+\end{thebibliography}
 
 \end{document}
