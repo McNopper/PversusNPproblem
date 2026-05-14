@@ -192,16 +192,25 @@ bump $d_{\max} \leftarrow d_{\max} + 1$, reset $m, s, k$ to $1, 1, 0$,
 and restart Phase~2.
 \end{enumerate}
 
-\paragraph{Termination.} Inside a fixed $d_{\max}$, the inner
-\texttt{while} loop runs at most $\lfloor \log_2 m_{\text{ceiling}}
-\rfloor + \lfloor \log_2 s_{\text{ceiling}} \rfloor + 8$ sweeps: $m$
-doubles at most $\lfloor \log_2 m_{\text{ceiling}} \rfloor$ times
-before saturating and likewise for $s$, after which the loop must hit
-8 consecutive non-improving sweeps and break. The outer \texttt{for}
-loop runs over $d_{\max} = 1, \dots, d_{\text{ceiling}}$. Hence the
-total number of sweeps is finite. The running best is updated only when
-strictly improved, so the returned tour has length monotone
-non-increasing in the execution trace and is bounded below by $0$.
+\paragraph{Termination.} For fixed parameters
+$(d_{\text{ceiling}}, m_{\text{ceiling}}, s_{\text{ceiling}})$, the
+candidate tours examined at any sweep are determined by the discrete
+configuration $(d_{\max}, m_{\text{eff}}, s_{\text{eff}}, \mu, \delta,
+k \bmod 8)$, drawn from an $O(1)$-sized set whose size depends only
+on the parameters and not on $n$. The running best $L$ is updated
+only on \emph{strict} improvement, so each improving sweep contributes
+a previously unseen, strictly shorter candidate; the total number of
+improving sweeps is therefore bounded by the size of this candidate
+set, hence $O(1)$. Each non-improving sweep increments
+\texttt{no\_improve}; reaching $8$ breaks the inner \texttt{while}.
+Between any two consecutive improvements there are at most $7$
+non-improving sweeps, and at most $8$ non-improving sweeps follow the
+last improvement, so the total number of sweeps per $d_{\max}$ is
+also $O(1)$. The outer \texttt{for} loop runs over $d_{\max} = 1,
+\dots, d_{\text{ceiling}}$, so the algorithm terminates after $O(1)$
+sweeps overall (for fixed parameters). The returned tour has length
+monotone non-increasing along the execution trace and is bounded
+below by $0$.
 
 \subsection{Pseudocode}
 
@@ -365,10 +374,10 @@ $O(n)$ for \texttt{BruteForceConnect} (Lemma~3); together $O(n^2)$ per
 the run, the number of \texttt{EvalAt} invocations per
 \texttt{SandclockSweep} is
 $O(d_{\text{ceiling}} \cdot m_{\text{ceiling}} + s_{\text{ceiling}}) = O(1)$.
-The total number of sweeps in Phase~4 is bounded by
-$d_{\text{ceiling}} \cdot 8 \cdot (\log m_{\text{ceiling}} + \log s_{\text{ceiling}} + 1) = O(1)$,
-because both ceilings double on improvement and at most 8 consecutive
-non-improving sweeps occur at any rung. Multiplying gives $O(n^2)$.
+The total number of sweeps in Phase~4 is $O(1)$ for fixed parameters
+by the termination argument of \S1.3 (the per-sweep configuration is
+drawn from an $O(1)$-sized set and the running best strictly
+decreases along improvements).Multiplying gives $O(n^2)$.
 $\square$
 
 \paragraph{Corollary 1.} \textit{SiftTSP is a polynomial-time algorithm
